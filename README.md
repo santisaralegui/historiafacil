@@ -2,6 +2,8 @@
 
 Proyecto de página web con el objetivo de facilitar la escritura de historias clínicas en departamentos de emergencia hopsitalaria.
 
+Read this README in english: [English](README.en.md)
+
 ## ¿Cuál problema resuelve?
 
 En contexto de guardias hospitalarias el tiempo para escribir historias clínicas es escazo. Cotidianamente los profesionales de la salud se ven enfrentados a escribir historias clínicas con una estructura básica similar, en un contexto donde el tiempo es limitado. Este proyecto trata de resolver este problema al automatizar la estructura básica de las historias clínicas y las repeticiones más frecuentes. Esto ayudaría a reducir el tiempo que el profesional dedica al registro, generando mas tiempo disponible. Esto, en última instancia, reduciría el tiempo necesario por paciente, mejorando los tiempos de espera y la calidad de atención.
