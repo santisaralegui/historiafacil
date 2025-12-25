@@ -4,21 +4,41 @@
 </head>
 <header>
     <h1>Historia clínica fácil</h1>
-    <p>Una herramienta para crear historias clínicas de forma rápida y eficiente.</p>
+    <p>Sitio en desarrollo</p>
 </header>
-<nav>
-    <a href="#">Adultos</a>
-    <a href="#">Pediatría</a>
-    <a href="#">Enfermería</a>
-    <a href="#">Descripciones</a>
-</nav>
-<main>
+<body>
+    <main>
+        <h2>Historia clínica adulto</h2>
+        <p id="historia-adulto">
+            AP:<br>
+            - HTA en tto con<br>
+            - Niega alergias<br><br>
 
-</main>
-<footer>
-    <p>
-        <a href="#">Contacto</a> /
-        <a href="#">FAQs</a> /
-        <a href="#">Sobre mi</a>
-    </p>
-</footer>
+            EA: Tránsitos sin alteraciones. No fiebre.<br><br>
+
+            Ex. físico:<br>
+            PyM: Bien hidratadas y perfundidas, sin lesiones.<br>
+            PP: MAV presente bilateral sin estertores, eupneico.<br>
+            CV: RR 80 lpm, RBG, SL.<br><br>
+
+            Conducta:<br>
+            - <br>
+            - Se explican signos de reconsulta<br>
+            - Alta<br>
+        </p>
+        <button onclick="copiar()">Copiar</button>
+    </main>
+    <footer>
+        <p>
+            <a href="#">Contacto</a> /
+            <a href="#">FAQs</a> /
+            <a href="#">Sobre mi</a>
+        </p>
+    </footer>
+</body>
+<script>
+    function copiar()
+    {
+        navigator.clipboard.writeText(document.getElementById("historia-adulto").innerText);
+    }
+</script>
