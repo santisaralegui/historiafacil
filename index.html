@@ -1,44 +1,48 @@
-<head>
-    <title>Historia fácil</title>
-    <meta charset="UTF-8">
-</head>
-<header>
-    <h1>Historia clínica fácil</h1>
-    <p>Sitio en desarrollo</p>
-</header>
-<body>
-    <main>
-        <h2>Historia clínica adulto</h2>
-        <p id="historia-adulto">
-            AP:<br>
-            - HTA en tto con<br>
-            - Niega alergias<br><br>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Historia fácil</title>
+        <meta charset="UTF-8">
+    </head>
+    <header>
+        <h1>Historia clínica fácil</h1>
+        <p>Sitio en desarrollo</p>
+    </header>
+    <body>
+        <main>
+            <h2>Historia clínica adulto</h2>
+            <p id="historia-adulto">
+                AP:<br>
+                - HTA en tto con<br>
+                - Niega alergias<br><br>
 
-            EA: Tránsitos sin alteraciones. No fiebre.<br><br>
+                EA: Tránsitos sin alteraciones. No fiebre.<br><br>
 
-            Ex. físico:<br>
-            PyM: Bien hidratadas y perfundidas, sin lesiones.<br>
-            PP: MAV presente bilateral sin estertores, eupneico.<br>
-            CV: RR 80 lpm, RBG, SL.<br><br>
+                Ex. físico:<br>
+                PyM: Bien hidratadas y perfundidas, sin lesiones.<br>
+                PP: MAV presente bilateral sin estertores, eupneico.<br>
+                CV: RR 80 lpm, RBG, SL.<br><br>
 
-            Conducta:<br>
-            - <br>
-            - Se explican signos de reconsulta<br>
-            - Alta<br>
-        </p>
-        <button onclick="copiar()">Copiar</button>
-    </main>
-    <footer>
-        <p>
-            <a href="#">Contacto</a> /
-            <a href="#">FAQs</a> /
-            <a href="#">Sobre mi</a>
-        </p>
-    </footer>
-</body>
-<script>
-    function copiar()
-    {
-        navigator.clipboard.writeText(document.getElementById("historia-adulto").innerText);
-    }
-</script>
+                Conducta:<br>
+                - <br>
+                - Se explican signos de reconsulta<br>
+                - Alta<br>
+            </p>
+            <button onclick="copiar()">Copiar</button>
+            <p>En un futuro la historia se podrá modificar directo en la página.</p>
+        </main>
+        <footer>
+            <p>
+                <a href="#">Contacto</a> /
+                <a href="#">FAQs</a> /
+                <a href="#">Sobre mi</a>
+            </p>
+        </footer>
+    </body>
+    <script>
+        function copiar()
+        {
+            navigator.clipboard.writeText(document.getElementById("historia-adulto").innerText);
+        }
+    </script>
+</html>
