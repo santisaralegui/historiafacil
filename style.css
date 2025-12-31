@@ -5,3 +5,11 @@ header {
     padding: 2px;
     text-align: center;
 }
+
+.formulario {
+    background-color: lightblue;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 5px 20px 5px;
+    box-shadow: 5px 5px 5px grey;
+}
