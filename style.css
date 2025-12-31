@@ -1,3 +1,5 @@
+* { box-sizing: border-box;}
+
 header {
     background: rgb(218, 232, 255);
     padding: 2px;
