@@ -1,4 +1,4 @@
-* { box-sizing: border-box;}
+* { box-sizing: border-box; }
 
 header {
     background: rgb(218, 232, 255);
@@ -12,4 +12,40 @@ header {
     padding: 20px;
     margin: 20px 5px 20px 5px;
     box-shadow: 5px 5px 5px grey;
+}
+
+p, li, ul {
+    margin: 0;
+}
+
+.linea-texto {
+    display: flex;
+    align-items: flex-start;
+}
+
+input[type="text"] {
+    /*
+    Agregar valores para input, porque si los modifico salen del diseño predeterminado del navegador.
+    */
+    border-radius: 5px;
+    border-width: 1px;
+}
+input[type="text"]::placeholder {
+    color: black;
+}
+
+.antecedente{
+    width: 100px;
+}
+
+.tachado {
+    text-decoration: line-through;
+}
+
+.inactivo {
+    background-color: gray;
+}
+
+.oculto {
+    display: none;
 }
