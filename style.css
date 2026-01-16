@@ -38,6 +38,10 @@ input[type="text"]::placeholder {
     width: 100px;
 }
 
+.antecedente-tto{
+    width: 250px;
+}
+
 .tachado {
     text-decoration: line-through;
 }
