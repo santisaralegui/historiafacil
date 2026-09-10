@@ -1,0 +1,26 @@
+{
+  "name": "Historia clinica de emergencia",
+  "short_name": "Historia clinica",
+  "description": "Generador rapido de historias clinicas de emergencia.",
+  "start_url": "./historia-clinica-emergencia.html",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#1d6f8f",
+  "icons": [
+    {
+      "src": "favicon-64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
