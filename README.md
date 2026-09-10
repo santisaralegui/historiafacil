@@ -1,27 +1,35 @@
 # Historia Fácil
 
-Proyecto de página web con el objetivo de facilitar la escritura de historias clínicas en departamentos de emergencia hopsitalaria.
+Web project aimed at making it easier to write medical records in hospital emergency departments.
 
-Read this README in english: [English](README.en.md)
+🔗 **Live:** [historiafacil.com](https://historiafacil.com)
 
-## ¿Cuál problema resuelve?
+Lee este README en español: [Español](README.es.md)
 
-En contexto de guardias hospitalarias el tiempo para escribir historias clínicas es escazo. Cotidianamente los profesionales de la salud se ven enfrentados a escribir historias clínicas con una estructura básica similar, en un contexto donde el tiempo es limitado. Este proyecto trata de resolver este problema al automatizar la estructura básica de las historias clínicas y las repeticiones más frecuentes. Esto ayudaría a reducir el tiempo que el profesional dedica al registro, generando mas tiempo disponible. Esto, en última instancia, reduciría el tiempo necesario por paciente, mejorando los tiempos de espera y la calidad de atención.
+## What problem does it solve?
 
-## Privacidad
+During hospital emergency shifts, healthcare professionals face high patient volume and very limited time to document each visit. Most low-complexity records share a similar basic structure, yet are still written from scratch every time. Historia Fácil automates that repetitive structure through predefined, editable templates — reducing documentation time and freeing up time for patient care.
 
-Las historias clínicas tienen información sensible y confidencial, por lo que el proyecto es elaborado únicamente con HTML, CSS, y JavaScript. Esto posibilita que **toda la información se procese localmente**, por lo que los datos de los pacientes estarán protegidos, ya que no se transmitirán fuera del cliente.
+## Privacy
 
-## Uso
+Medical records contain sensitive and confidential information. This project is built using only HTML, CSS, and JavaScript, so **all data processing happens locally in the browser** — no patient data is ever transmitted to a server.
 
-Abrir 'Index.html' en un navegador.
+## How it works
 
-## Tecnologías
+- Fully static, client-side application — no backend, no database.
+- Predefined templates cover the most common low-complexity visit types.
+- Fields are editable before generating the final record text.
+
+## Usage
+
+Open `index.html` in a web browser, or use the live version at [historiafacil.com](https://historiafacil.com).
+
+## Technologies
 
 - HTML
 - CSS
 - JavaScript
 
-## Estado
+## Status
 
-En desarrollo.
+Live — in active use by emergency physicians during hospital shifts.
