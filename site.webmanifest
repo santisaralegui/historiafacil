@@ -2,7 +2,7 @@
   "name": "Historia clinica de emergencia",
   "short_name": "Historia clinica",
   "description": "Generador rapido de historias clinicas de emergencia.",
-  "start_url": "./historia-clinica-emergencia.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f6f8",
   "theme_color": "#1d6f8f",
