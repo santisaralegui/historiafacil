@@ -10,6 +10,7 @@
   --accent-dark: #14546e;
   --ok: #1f7a4d;
   --warn: #9a5a00;
+  --danger: #b42318;
   --field: #fbfcfd;
   --shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -155,6 +156,64 @@ footer a:hover {
   gap: 10px;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.page-index .template-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.page-index .template-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+
+.page-index .template-list[hidden] {
+  display: none;
+}
+
+.page-index .template-item {
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.page-index .template-item:hover,
+.page-index .template-item:focus-visible {
+  background: #eaf2f6;
+  outline: none;
+}
+
+.page-index input.is-abnormal {
+  border-color: var(--danger);
+  background: #fef3f2;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.page-index input.is-abnormal:focus {
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.16);
+}
+
+.page-index .vital-alert {
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .page-index .top-menu {
@@ -439,6 +498,7 @@ footer a:hover {
 
 @media (max-width: 900px) {
   .page-index header {
+    position: static;
     align-items: flex-start;
     flex-direction: column;
   }
@@ -457,6 +517,14 @@ footer a:hover {
     flex: 1 1 130px;
   }
 
+  .page-index .header-actions .template-menu {
+    flex: 1 1 130px;
+  }
+
+  .page-index .template-menu .button {
+    width: 100%;
+  }
+
   .page-index main {
     grid-template-columns: 1fr;
   }
@@ -467,10 +535,6 @@ footer a:hover {
 }
 
 @media (max-width: 620px) {
-  .page-index header {
-    position: static;
-  }
-
   .page-index .grid, .page-index .grid.three, .page-index .antecedente-row {
     grid-template-columns: 1fr;
   }

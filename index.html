@@ -37,6 +37,10 @@
       <a class="menu-item" href="contacto.html">Contacto profesional</a>
     </nav>
     <div class="header-actions">
+      <div class="template-menu" id="templateMenu">
+        <button class="button secondary" id="templateToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="templateList">Plantillas ▾</button>
+        <div class="template-list" id="templateList" role="menu" hidden></div>
+      </div>
       <button class="button" id="copyTop" type="button">Copiar historia</button>
       <button class="button secondary" id="downloadTxt" type="button">Descargar TXT</button>
       <button class="button warn" id="clearAll" type="button">Limpiar</button>
@@ -447,7 +451,73 @@
       return blocks.join("\n\n");
     }
 
+    function numbersIn(text) {
+      return (text.replace(/,/g, ".").match(/\d+(?:\.\d+)?/g) || []).map(Number);
+    }
+
+    // Devuelve el hallazgo anormal de cada signo vital, o "" si está en rango.
+    const VITAL_CHECKS = {
+      pa(text) {
+        // Formato sistólica/diastólica; no se evalúa hasta que ambas estén escritas.
+        const match = text.match(/(\d+)\s*\/\s*(\d+)/);
+        if (!match) return "";
+        const sistolica = Number(match[1]);
+        const diastolica = Number(match[2]);
+        if (sistolica < 90) return "Hipotensión";
+        if (sistolica >= 140 || diastolica >= 90) return "Hipertensión";
+        return "";
+      },
+      fc(text) {
+        const [fc] = numbersIn(text);
+        if (fc === undefined) return "";
+        if (fc < 60) return "Bradicardia";
+        if (fc > 100) return "Taquicardia";
+        return "";
+      },
+      fr(text) {
+        const [fr] = numbersIn(text);
+        if (fr === undefined) return "";
+        if (fr < 12) return "Bradipnea";
+        if (fr >= 20) return "Polipnea";
+        return "";
+      },
+      sat(text) {
+        const [sat] = numbersIn(text);
+        if (sat === undefined) return "";
+        return sat < 94 ? "Desaturación" : "";
+      },
+      temp(text) {
+        const [temp] = numbersIn(text);
+        if (temp === undefined) return "";
+        return temp >= 38 ? "Fiebre" : "";
+      },
+      hgt(text) {
+        const [hgt] = numbersIn(text);
+        if (hgt === undefined) return "";
+        if (hgt < 70) return "Hipoglucemia";
+        if (hgt > 180) return "Hiperglucemia";
+        return "";
+      }
+    };
+
+    function updateVitalAlerts() {
+      Object.entries(VITAL_CHECKS).forEach(([field, check]) => {
+        const input = document.querySelector(`[data-field="${field}"]`);
+        let alert = input.parentElement.querySelector(".vital-alert");
+        if (!alert) {
+          alert = document.createElement("span");
+          alert.className = "vital-alert";
+          input.after(alert);
+        }
+        const finding = check(input.value.trim());
+        input.classList.toggle("is-abnormal", Boolean(finding));
+        alert.textContent = finding;
+        alert.hidden = !finding;
+      });
+    }
+
     function update() {
+      updateVitalAlerts();
       preview.textContent = buildHistoria() || "Complete campos a la izquierda para generar la historia clínica.";
       const disabled = sinAlergias.checked;
       alergiasInput.disabled = disabled;
@@ -460,6 +530,47 @@
       ecgDescripcionLabel.hidden = ecgNormal.checked;
       status.textContent = "Actualizado";
       status.className = "status";
+      saveDraft();
+    }
+
+    // Borrador guardado en este navegador para no perder lo escrito si se cierra la página.
+    // Se descarta pasadas DRAFT_MAX_AGE_MS para no mostrar datos de otro paciente en equipos compartidos.
+    const DRAFT_KEY = "historiafacil:borrador";
+    const DRAFT_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+
+    function saveDraft() {
+      const fields = {};
+      form.querySelectorAll("[data-field]").forEach((el) => {
+        fields[el.dataset.field] = el.type === "checkbox" || el.type === "radio" ? el.checked : el.value;
+      });
+      const antecedentes = [...antecedentesBox.querySelectorAll(".antecedente-row")].map((row) => ({
+        name: row.querySelector(".ap-name").value,
+        treatment: row.querySelector(".ap-treatment").value,
+        other: row.querySelector(".ap-other").value
+      }));
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({ savedAt: Date.now(), fields, antecedentes }));
+      } catch {}
+    }
+
+    function restoreDraft() {
+      let draft;
+      try {
+        draft = JSON.parse(localStorage.getItem(DRAFT_KEY));
+      } catch {
+        return false;
+      }
+      if (!draft || !draft.fields || Date.now() - draft.savedAt > DRAFT_MAX_AGE_MS) return false;
+      Object.entries(draft.fields).forEach(([field, fieldValue]) => {
+        const el = form.querySelector(`[data-field="${field}"]`);
+        if (!el) return;
+        if (el.type === "checkbox" || el.type === "radio") el.checked = Boolean(fieldValue);
+        else el.value = fieldValue;
+      });
+      antecedentesBox.innerHTML = "";
+      (draft.antecedentes || []).forEach((data) => addAntecedente(data));
+      if (!antecedentesBox.children.length) addAntecedente();
+      return true;
     }
 
     async function copyHistoria() {
@@ -493,6 +604,10 @@
 
     function clearAll() {
       if (!confirm("¿Limpiar todos los campos?")) return;
+      resetForm();
+    }
+
+    function resetForm() {
       form.reset();
       antecedentesBox.innerHTML = "";
       addAntecedente();
@@ -508,6 +623,58 @@
       document.querySelector("[data-field='ecgFrecuencia']").value = "80";
       ecgNormal.checked = true;
       update();
+    }
+
+    const TEMPLATES = {
+      cuadroViral: {
+        label: "Faringitis viral",
+        enfermedad: "Comienza hace ___ días con odinofagia, rinorrea serosa y mialgias.",
+        cardioNegativo: true,
+        respNegativo: true,
+        pym: "BHyP, faringe congestiva",
+        conducta: "Ibuprofeno 400 mg cada 8 horas VO si dolor o fiebre",
+        reconsultaAlta: true
+      },
+      gastroenterocolitis: {
+        label: "Gastroenterocolitis aguda",
+        enfermedad: "Comienza hace ___ días con diarrea y vómitos sin elementos anormales. Asocia dolor abdominal tipo cólico difuso sin irradiaciones del mismo tiempo de evolución. Diuresis conservada.",
+        transitoNormal: false,
+        abd: "Blando, depresible, dolor difuso a la palpación a predominio centroabdominal, no dolor a la descompresión. Sin elementos de irritación peritoneal",
+        conducta: [
+          "Ondansetrón 8 mg cada 8 horas VO si náuseas o vómitos por 2 días",
+          "Buscapina 10 mg cada 8 horas VO si dolor tipo cólico abdominal por 2 días",
+          "Alta ingesta hídrica",
+          "Dieta astringente"
+        ].join("\n"),
+        reconsultaAlta: true
+      },
+      lumbalgiaMecanica: {
+        label: "Lumbalgia mecánica",
+        enfermedad: "Lumbalgia de ___ días de evolución, que aumenta con movimientos y mejora con reposo, sin irradiaciones. No sd. medular. No sd. urinario bajo.",
+        ffll: "Dolor a la palpación a nivel lumbar. Guyón, Surraco y Giordano negativos",
+        conducta: "Ketoprofeno 100 mg cada 12 horas VO si dolor por 5 días",
+        reconsultaAlta: true
+      }
+    };
+
+    function applyTemplate(name) {
+      const template = TEMPLATES[name];
+      if (!template) return;
+      resetForm();
+      Object.entries(template).forEach(([field, fieldValue]) => {
+        if (field === "label") return;
+        const el = document.querySelector(`[data-field="${field}"]`);
+        if (!el) return;
+        if (el.type === "checkbox" || el.type === "radio") el.checked = fieldValue;
+        else el.value = fieldValue;
+      });
+      update();
+      const enfermedad = document.querySelector("[data-field='enfermedad']");
+      const blank = enfermedad.value.indexOf("___");
+      if (blank !== -1) {
+        enfermedad.focus();
+        enfermedad.setSelectionRange(blank, blank + 3);
+      }
     }
 
     let expandedEditor = null;
@@ -571,6 +738,38 @@
     document.getElementById("copyTop").addEventListener("click", copyHistoria);
     document.getElementById("downloadTxt").addEventListener("click", downloadTxt);
     document.getElementById("clearAll").addEventListener("click", clearAll);
+    const templateMenu = document.getElementById("templateMenu");
+    const templateToggle = document.getElementById("templateToggle");
+    const templateList = document.getElementById("templateList");
+
+    function setTemplateMenuOpen(open) {
+      templateList.hidden = !open;
+      templateToggle.setAttribute("aria-expanded", String(open));
+    }
+
+    Object.entries(TEMPLATES).forEach(([name, template]) => {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "template-item";
+      item.setAttribute("role", "menuitem");
+      item.textContent = template.label;
+      item.addEventListener("click", () => {
+        setTemplateMenuOpen(false);
+        applyTemplate(name);
+      });
+      templateList.appendChild(item);
+    });
+
+    templateToggle.addEventListener("click", () => setTemplateMenuOpen(templateList.hidden));
+    document.addEventListener("click", (event) => {
+      if (!templateMenu.contains(event.target)) setTemplateMenuOpen(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !templateList.hidden) {
+        setTemplateMenuOpen(false);
+        templateToggle.focus();
+      }
+    });
     document.getElementById("addAntecedente").addEventListener("click", () => {
       const row = addAntecedente();
       row.querySelector(".ap-name").focus();
@@ -580,7 +779,7 @@
     form.addEventListener("input", update);
     form.addEventListener("change", update);
 
-    addAntecedente();
+    if (!restoreDraft()) addAntecedente();
     update();
   </script>
 </body>
