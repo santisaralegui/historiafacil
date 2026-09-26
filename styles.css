@@ -496,6 +496,17 @@ footer a:hover {
   background: #f7fbfc;
 }
 
+.page-index .coffee-link {
+  border-color: #f2d24b;
+  background: #ffdd00;
+  color: #17202a;
+}
+
+.page-index .coffee-link:hover {
+  border-color: #e0c200;
+  background: #ffe53d;
+}
+
 @media (max-width: 900px) {
   .page-index header {
     position: static;
