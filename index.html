@@ -783,8 +783,27 @@
     form.addEventListener("input", update);
     form.addEventListener("change", update);
 
+    function showReminder(text) {
+      const toast = document.createElement("div");
+      toast.className = "reminder-toast";
+      toast.setAttribute("role", "status");
+      toast.textContent = text;
+      document.body.appendChild(toast);
+      toast.getBoundingClientRect(); // fuerza el estilo inicial para que se anime la entrada
+      toast.classList.add("is-visible");
+      setTimeout(() => {
+        toast.classList.remove("is-visible");
+        toast.addEventListener("transitionend", () => toast.remove(), { once: true });
+      }, 5000);
+    }
+
+    // Texto de la página vacía, para avisar solo si el borrador restaurado tiene datos.
+    const emptyHistoria = buildHistoria();
     if (!restoreDraft()) addAntecedente();
     update();
+    if (buildHistoria() !== emptyHistoria) {
+      showReminder("Recordá limpiar la página antes de iniciar con un nuevo paciente");
+    }
   </script>
 </body>
 </html>
