@@ -194,9 +194,16 @@
       </section>
 
       <section>
-        <h2>Paraclínica e interconsultas</h2>
+        <h2>Paraclínica, interconsultas o procedimientos</h2>
         <label>Estudios, resultados e interconsultas
           <textarea data-field="paraclinica" placeholder="Ej: RxTx, laboratorio, consulta con especialista, procedimientos, etc."></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>Planteo diagnóstico</h2>
+        <label>Planteo diagnóstico
+          <input data-field="planteoDiagnostico" placeholder="Ej: faringitis viral, cólico nefrítico">
         </label>
       </section>
 
@@ -437,7 +444,7 @@
         sentence("ABD", fieldOrNormal("abd", "abdNormal", "Blando, depresible, indoloro, RHA +")),
         sentence("LG", fieldOrNormal("lg", "lgNormal", "Sin adenomegalias")),
         sentence("OA", value("oa")),
-        sentence("PNM", fieldOrNormal("pnm", "pnmNormal", "Glasgow 15, pupilas reactivas y simétricas, sin síndrome focal neurológico")),
+        sentence("PNM", fieldOrNormal("pnm", "pnmNormal", "Glasgow 15, pupilas reactivas y simétricas, sin síndrome focal neurológico, sin rigidez de nuca")),
         sentence("FFLL", fieldOrNormal("ffll", "ffllNormal", "Libres e indoloras")),
         value("otrosEf") ? `${value("otrosEf")}${/[.!?]$/.test(value("otrosEf")) ? "" : "."}` : ""
       ].filter(Boolean).join("\n");
@@ -449,6 +456,7 @@
         examen ? `Examen físico:\n${examen}` : "",
         ecgTexto(),
         paraclinicaTexto(),
+        value("planteoDiagnostico") ? `Planteo diagnóstico: ${value("planteoDiagnostico")}` : "",
         conductaTexto()
       ].filter(Boolean);
 
@@ -636,7 +644,20 @@
         cardioNegativo: true,
         respNegativo: true,
         pym: "BHyP, faringe congestiva",
+        planteoDiagnostico: "Faringitis viral",
         conducta: "Ibuprofeno 400 mg cada 8 horas VO si dolor o fiebre",
+        reconsultaAlta: true
+      },
+      faringitisBacteriana: {
+        label: "Faringitis bacteriana",
+        enfermedad: "Comienza hace ___ días con odinofagia y fiebre. Tos y rinorrea escasas.",
+        noFiebreChuchos: false,
+        pym: "BHyP, exudados retrofaríngeos",
+        planteoDiagnostico: "Faringitis bacteriana",
+        conducta: [
+          "Amoxicilina 500 mg cada 8 horas VO por 10 días",
+          "Ibuprofeno 400 mg cada 8 horas VO si dolor o fiebre"
+        ].join("\n"),
         reconsultaAlta: true
       },
       gastroenterocolitis: {
@@ -644,6 +665,7 @@
         enfermedad: "Comienza hace ___ días con diarrea y vómitos sin elementos anormales. Asocia dolor abdominal tipo cólico difuso sin irradiaciones del mismo tiempo de evolución. Diuresis conservada.",
         transitoNormal: false,
         abd: "Blando, depresible, dolor difuso a la palpación a predominio centroabdominal, no dolor a la descompresión. Sin elementos de irritación peritoneal",
+        planteoDiagnostico: "Gastroenterocolitis aguda",
         conducta: [
           "Ondansetrón 8 mg cada 8 horas VO si náuseas o vómitos por 2 días",
           "Buscapina 10 mg cada 8 horas VO si dolor tipo cólico abdominal por 2 días",
@@ -656,7 +678,61 @@
         label: "Lumbalgia mecánica",
         enfermedad: "Lumbalgia de ___ días de evolución, que aumenta con movimientos y mejora con reposo, sin irradiaciones. No sd. medular. No sd. urinario bajo.",
         ffll: "Dolor a la palpación a nivel lumbar. Guyón, Surraco y Giordano negativos",
+        planteoDiagnostico: "Lumbalgia mecánica",
         conducta: "Ketoprofeno 100 mg cada 12 horas VO si dolor por 5 días",
+        reconsultaAlta: true
+      },
+      cistitisNoComplicada: {
+        label: "Cistitis no complicada",
+        enfermedad: "Comienza hace ___ días con síndrome urinario bajo. Tránsito digestivo sin alteraciones.",
+        transitoNormal: false,
+        abdNormal: true,
+        ffllNormal: true,
+        planteoDiagnostico: "Cistitis no complicada",
+        conducta: "Nitrofurantoína 100 mg cada 6 horas VO por 5 días",
+        reconsultaAlta: true
+      },
+      cefaleaTensional: {
+        label: "Cefalea tensional",
+        enfermedad: "Cefalea de ___ días de evolución, de comienzo progresivo y evolución constante, holocraneana, de intensidad moderada, sin componente nocturno. Sin síndrome focal neurológico, sin vómitos.",
+        pnmNormal: true,
+        planteoDiagnostico: "Cefalea tensional",
+        conducta: "Paracetamol 1 g cada 8 horas VO si dolor",
+        reconsultaAlta: true
+      },
+      urticaria: {
+        label: "Urticaria",
+        enfermedad: "Comienza hace ___ horas con lesiones cutáneas sobreelevadas y pruriginosas. No disnea, no disfonía, no disfagia, no edema de labios ni lengua. No vómitos ni dolor abdominal.",
+        pym: "BHyP, pápulas en ___",
+        planteoDiagnostico: "Urticaria",
+        conducta: "Clorfeniramina maleato 4 mg cada 8 horas VO por 3 días",
+        reconsultaAlta: true
+      },
+      conjuntivitisBacteriana: {
+        label: "Conjuntivitis bacteriana",
+        enfermedad: "Comienza hace ___ días con ojo rojo y secreción purulenta, con párpados que se pegan al levantarse. No dolor ocular, sin alteraciones de la agudeza visual.",
+        otrosEf: "Examen oftalmológico: eritema conjuntival, exudado purulento, reflejo pupilar presente y simétrico, sin alteraciones de la motilidad ocular",
+        planteoDiagnostico: "Conjuntivitis bacteriana",
+        conducta: "Tobramicina oftálmica gotas, 1 gota cada 4 horas en ojo afectado por 7 días",
+        reconsultaAlta: true
+      },
+      colicoNefritico: {
+        label: "Cólico nefrítico",
+        enfermedad: "Comienza hace ___ con dolor en fosa lumbar, tipo cólico, intenso, que no calma en ninguna posición.",
+        abdNormal: true,
+        ffllNormal: true,
+        planteoDiagnostico: "Cólico nefrítico",
+        conducta: "Ketoprofeno 100 mg cada 12 horas VO por 5 días",
+        reconsultaAlta: true
+      },
+      urgenciaHipertensiva: {
+        label: "Urgencia hipertensiva",
+        enfermedad: "Consulta por cifras de PA elevadas constatadas en domicilio de ___. Sin cefalea intensa, sin alteraciones visuales, sin síndrome focal neurológico.",
+        cardioNegativo: true,
+        respNegativo: true,
+        mmii: "Sin edemas",
+        pnmNormal: true,
+        planteoDiagnostico: "Urgencia hipertensiva",
         reconsultaAlta: true
       }
     };
@@ -689,9 +765,20 @@
       expandedEditor = null;
     }
 
-    function openExpandedEditor(input) {
+    function openExpandedEditor(input, keepCaret = false) {
       if (expandedEditor?.source === input) return;
       closeExpandedEditor();
+      // Posición del cursor en el campo original (null en tipos que no la soportan, p. ej. number)
+      let caretStart = null;
+      let caretEnd = null;
+      if (keepCaret) {
+        try {
+          caretStart = input.selectionStart;
+          caretEnd = input.selectionEnd;
+        } catch (error) {
+          caretStart = caretEnd = null;
+        }
+      }
       const editor = document.createElement("textarea");
       const rect = input.getBoundingClientRect();
       editor.className = "expanded-editor";
@@ -709,7 +796,10 @@
       document.body.appendChild(editor);
       expandedEditor = editor;
       editor.focus();
-      editor.setSelectionRange(editor.value.length, editor.value.length);
+      if (caretStart === null || caretEnd === null) {
+        caretStart = caretEnd = editor.value.length;
+      }
+      editor.setSelectionRange(caretStart, caretEnd);
     }
 
     form.addEventListener("focusin", (event) => {
@@ -723,7 +813,7 @@
     form.addEventListener("input", (event) => {
       const input = event.target;
       if (input.matches("input:not([type='checkbox']):not([type='radio'])") && input.scrollWidth > input.clientWidth) {
-        openExpandedEditor(input);
+        openExpandedEditor(input, true);
       }
     });
 
