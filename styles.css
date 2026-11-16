@@ -143,7 +143,7 @@ footer a:hover {
   text-decoration: underline;
 }
 
-/* ---- Pagina: index.html (historia clinica) ---- */
+/* ---- Paginas de historia clinica (index, pediatria, ingreso, sala, egreso, estetica) ---- */
 
 .page-index header {
   position: sticky;
@@ -193,10 +193,64 @@ footer a:hover {
   cursor: pointer;
 }
 
+.page-index .template-empty {
+  margin: 0;
+  padding: 9px 10px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .page-index .template-item:hover,
 .page-index .template-item:focus-visible {
   background: #eaf2f6;
   outline: none;
+}
+
+/* Título de la página: desplegable para cambiar de tipo de historia */
+
+.page-index .page-menu {
+  position: relative;
+}
+
+.page-index .page-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: -4px -8px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.page-index .page-toggle:hover,
+.page-index .page-toggle:focus-visible {
+  background: #eef5f7;
+  outline: none;
+}
+
+.page-index .page-caret {
+  font-size: 0.6em;
+  color: var(--muted);
+}
+
+.page-index .page-list {
+  left: -8px;
+  min-width: 240px;
+}
+
+.page-index a.template-item {
+  text-decoration: none;
+}
+
+.page-index .template-item[aria-current="page"] {
+  font-weight: 700;
+  color: var(--accent-dark);
+  background: #eef5f7;
 }
 
 .page-index input.is-abnormal {
@@ -329,6 +383,15 @@ footer a:hover {
   color: #7a8490;
 }
 
+/* ECG desmarcado en un bloque plegable: queda solo la casilla, sin recuadro */
+.page-index .ecg-options.is-collapsed {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
 .page-index .ecg-editor-label {
   display: block;
   grid-column: 1 / -1;
@@ -379,7 +442,7 @@ footer a:hover {
 
 .page-index .check {
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   color: #27313d;
   width: auto;
   max-width: 100%;
@@ -388,9 +451,11 @@ footer a:hover {
 }
 
 .page-index .check input {
+  flex: 0 0 auto;
   width: 18px;
   height: 18px;
   min-height: 18px;
+  margin: 0;
   accent-color: var(--accent);
 }
 
@@ -486,6 +551,90 @@ footer a:hover {
   color: var(--muted);
   font-size: 12px;
   margin: 7px 0 0;
+}
+
+/* Selector deslizante (p. ej. tipo de examen físico) */
+
+.page-index .segmented {
+  --selected: 0;
+  --count: 3;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--count), minmax(0, 1fr));
+  margin: 12px 0;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #e8edf1;
+}
+
+.page-index .segmented label {
+  position: relative;
+  z-index: 1;
+  display: block;
+  padding: 8px 6px;
+  border-radius: 999px;
+  color: #27313d;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.page-index .segmented label:has(input:checked) {
+  color: #ffffff;
+}
+
+.page-index .segmented input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.page-index .segmented label:has(input:focus-visible) {
+  box-shadow: 0 0 0 3px rgba(29, 111, 143, 0.3);
+}
+
+.page-index .segmented-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / var(--count));
+  border-radius: 999px;
+  background: var(--accent);
+  transform: translateX(calc(var(--selected) * 100%));
+  transition: transform 0.2s ease;
+}
+
+.page-index .exam-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.page-index .tep-row {
+  margin-top: 0;
+}
+
+.page-index .after-hint,
+.page-index .exam-gap {
+  margin-top: 12px;
+}
+
+.page-index .field-with-check select {
+  min-width: 110px;
+}
+
+.page-index .hint + .grid {
+  margin-top: 12px;
 }
 
 .page-index .toast {

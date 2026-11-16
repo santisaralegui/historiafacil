@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historia clínica de ingreso | Dr. Santiago Saralegui</title>
+  <meta name="description" content="Herramienta web para crear historias clínicas de ingreso de forma rápida, ordenada y lista para copiar. Desarrollada por Dr. Santiago Saralegui.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Dr. Santiago Saralegui">
+  <meta property="og:title" content="Historia clínica de ingreso">
+  <meta property="og:description" content="Generador rápido de historias clínicas de ingreso para profesionales de la salud.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon-64.png" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    const GA_MEASUREMENT_ID = "G-SN3JTPR3M0";
+    if (GA_MEASUREMENT_ID) {
+      const gaScript = document.createElement("script");
+      gaScript.async = true;
+      gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+      document.head.appendChild(gaScript);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", GA_MEASUREMENT_ID);
+    }
+  </script>
+</head>
+<body class="page-index" data-page="ingreso.html">
+  <header>
+    <div class="page-menu" id="pageMenu">
+      <h1><button class="page-toggle" id="pageToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="pageList">Historia de ingreso <span class="page-caret" aria-hidden="true">▾</span></button></h1>
+      <div class="template-list page-list" id="pageList" role="menu" hidden></div>
+    </div>
+    <nav class="top-menu" aria-label="Opciones">
+      <a class="menu-item" href="contacto.html">Contacto profesional</a>
+    </nav>
+    <div class="header-actions">
+      <button class="button" id="copyTop" type="button">Copiar historia</button>
+      <button class="button secondary" id="downloadTxt" type="button">Descargar TXT</button>
+      <button class="button warn" id="clearAll" type="button">Limpiar</button>
+    </div>
+  </header>
+
+  <main>
+    <form class="column form-column" id="hcForm" autocomplete="off">
+      <section>
+        <h2>Ficha patronímica</h2>
+        <div class="check-row">
+          <label class="check"><input type="radio" name="sexo" data-field="sexoF" value="F"> Sexo femenino</label>
+          <label class="check"><input type="radio" name="sexo" data-field="sexoM" value="M"> Sexo masculino</label>
+        </div>
+        <div class="grid three">
+          <label>Edad
+            <input data-field="edad" placeholder="Ej: 76">
+          </label>
+          <label>Trabajo
+            <input data-field="trabajo" placeholder="Ej: jubilado, administrativo">
+          </label>
+          <label>Procedencia
+            <input data-field="procedencia" placeholder="Ej: Montevideo, residencial">
+          </label>
+        </div>
+        <div class="check-row">
+          <label class="check"><input type="radio" name="funcionalidad" data-field="funcionalidadNoConsignar" checked> No consignar</label>
+          <label class="check"><input type="radio" name="funcionalidad" data-field="autovalido"> Autoválido</label>
+          <label class="check"><input type="radio" name="funcionalidad" data-field="dependiente"> Dependiente</label>
+          <label class="check"><input type="checkbox" data-field="institucionalizado"> Institucionalizado</label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Antecedentes personales</h2>
+        <div id="antecedentes"></div>
+        <button class="button secondary" id="addAntecedente" type="button">Agregar antecedente</button>
+        <p class="hint">Tab pasa al tratamiento. Enter agrega otra línea.</p>
+        <div class="grid">
+          <label>Hábitos
+            <input data-field="habitos" placeholder="Ej: tabaquista 20 paquetes/año, no alcohol">
+          </label>
+          <label>Antecedentes familiares
+            <input data-field="af" placeholder="Ej: padre con IAM a los 50 años">
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Alergias</h2>
+        <label class="check"><input type="checkbox" data-field="sinAlergias" checked> Sin alergias</label>
+        <label id="alergiasLabel">Alergias
+          <input data-field="alergias" placeholder="Ej: dipirona, penicilina">
+        </label>
+      </section>
+
+      <section>
+        <h2>Motivo de consulta</h2>
+        <label>Motivo de consulta
+          <input data-field="motivoConsulta" placeholder="Ej: disnea, fiebre, dolor abdominal">
+        </label>
+      </section>
+
+      <section>
+        <h2>Enfermedad actual</h2>
+        <label>Relato
+          <textarea data-field="enfermedad" placeholder="Consulta, síntomas, evolución, medicación recibida, etc."></textarea>
+        </label>
+        <div class="check-row">
+          <label class="check"><input type="checkbox" data-field="noFiebreChuchos" checked> No fiebre, no chuchos de frío</label>
+          <label class="check"><input type="checkbox" data-field="transitoNormal" checked> Tránsito sin alteraciones</label>
+          <label class="check"><input type="checkbox" data-field="cardioNegativo"> No dolor torácico, palpitaciones, síncope ni mareos</label>
+          <label class="check"><input type="checkbox" data-field="respNegativo"> No disnea ni dolor tipo puntada de lado</label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Examen físico en emergencia</h2>
+        <div class="grid three">
+          <label>PA
+            <input data-field="emPa" placeholder="Ej: 130/80">
+          </label>
+          <label>FC
+            <input data-field="emFc" value="80">
+          </label>
+          <label>FR
+            <input data-field="emFr" placeholder="Ej: 18">
+          </label>
+          <label>SatO2
+            <input data-field="emSat" placeholder="Ej: 98% VEA">
+          </label>
+          <label>Temperatura
+            <input data-field="emTemp" placeholder="Ej: 36,8 °C">
+          </label>
+          <label>HGT
+            <input data-field="emHgt" placeholder="Ej: 112 mg/dL">
+          </label>
+        </div>
+        <label>General
+          <input data-field="emGeneral" value="Lúcido">
+        </label>
+        <label>Piel y mucosas
+          <input data-field="emPym" value="BHyP">
+        </label>
+        <div class="grid">
+          <label>CV
+            <input data-field="emCv" value="RR, RBG, SL">
+          </label>
+          <label>MMII
+            <input data-field="emMmii" placeholder="Ej: sin edemas en MMII">
+          </label>
+        </div>
+        <label>PP
+          <input data-field="emPp" value="MAV + bilateral, sin estertores">
+        </label>
+        <div class="grid">
+          <div class="field-with-check">
+            <label>ABD
+              <input data-field="emAbd" placeholder="Ej: blando, depresible, indoloro, RHA +">
+            </label>
+            <label class="check"><input type="checkbox" data-field="emAbdNormal"> Normal</label>
+          </div>
+          <div class="field-with-check">
+            <label>LG
+              <input data-field="emLg" placeholder="Ej: sin adenomegalias">
+            </label>
+            <label class="check"><input type="checkbox" data-field="emLgNormal"> Normal</label>
+          </div>
+          <label>OA
+            <input data-field="emOa" placeholder="Ej: sin elementos fluxivos articulares">
+          </label>
+          <div class="field-with-check">
+            <label>PNM
+              <input data-field="emPnm" placeholder="Ej: sin focalidad neurológica">
+            </label>
+            <label class="check"><input type="checkbox" data-field="emPnmNormal"> Normal</label>
+          </div>
+          <div class="field-with-check">
+            <label>FFLL
+              <input data-field="emFfll" placeholder="Ej: libres e indoloras">
+            </label>
+            <label class="check"><input type="checkbox" data-field="emFfllNormal"> Normal</label>
+          </div>
+          <label>Otros EF
+            <input data-field="emOtrosEf" placeholder="Otro hallazgo del examen físico">
+          </label>
+        </div>
+
+        <div class="ecg-options is-disabled" data-prefix="em" data-collapse>
+          <label class="check"><input type="checkbox" data-field="emIncluirEcg"> ECG</label>
+          <label class="check"><input type="checkbox" data-field="emEcgNormal" checked disabled> Normal</label>
+          <label class="ecg-editor-label">
+            <span class="ecg-normal-editor" aria-label="Descripción normal del ECG; solo la frecuencia cardíaca es editable">
+              ECG: RS <input data-field="emEcgFrecuencia" value="80" inputmode="numeric" aria-label="Frecuencia cardíaca del ECG" disabled> lpm, intervalo PR de duración normal, QRS fino, sin alteraciones del ST ni otros signos de isquemia aguda.
+            </span>
+          </label>
+          <label class="ecg-editor-label" hidden>
+            <textarea class="ecg-custom-editor" data-field="emEcgDescripcion" aria-label="Descripción del ECG" placeholder="ECG: describa ritmo, frecuencia, intervalos, QRS, ST y otros hallazgos" disabled></textarea>
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Evolución en emergencia</h2>
+        <label>Evolución en emergencia
+          <textarea data-field="enEmergencia" placeholder="Estado al llegar, paraclínica, tratamiento recibido y evolución en emergencia"></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>Motivo de ingreso</h2>
+        <label>Motivo de ingreso
+          <input data-field="motivoIngreso" placeholder="Ej: NAC con criterios de ingreso, estudio y tratamiento">
+        </label>
+      </section>
+
+      <section>
+        <h2>Examen físico en sala</h2>
+        <div class="grid three">
+          <label>PA
+            <input data-field="pa" placeholder="Ej: 130/80">
+          </label>
+          <label>FC
+            <input data-field="fc" value="80">
+          </label>
+          <label>FR
+            <input data-field="fr" placeholder="Ej: 18">
+          </label>
+          <label>SatO2
+            <input data-field="sat" placeholder="Ej: 98% VEA">
+          </label>
+          <label>Temperatura
+            <input data-field="temp" placeholder="Ej: 36,8 °C">
+          </label>
+          <label>HGT
+            <input data-field="hgt" placeholder="Ej: 112 mg/dL">
+          </label>
+        </div>
+        <label>General
+          <input data-field="general" value="Lúcido">
+        </label>
+        <label>Piel y mucosas
+          <input data-field="pym" value="BHyP">
+        </label>
+        <div class="grid">
+          <label>CV
+            <input data-field="cv" value="RR, RBG, SL">
+          </label>
+          <label>MMII
+            <input data-field="mmii" placeholder="Ej: sin edemas en MMII">
+          </label>
+        </div>
+        <label>PP
+          <input data-field="pp" value="MAV + bilateral, sin estertores">
+        </label>
+        <div class="grid">
+          <div class="field-with-check">
+            <label>ABD
+              <input data-field="abd" placeholder="Ej: blando, depresible, indoloro, RHA +">
+            </label>
+            <label class="check"><input type="checkbox" data-field="abdNormal"> Normal</label>
+          </div>
+          <div class="field-with-check">
+            <label>LG
+              <input data-field="lg" placeholder="Ej: sin adenomegalias">
+            </label>
+            <label class="check"><input type="checkbox" data-field="lgNormal"> Normal</label>
+          </div>
+          <label>OA
+            <input data-field="oa" placeholder="Ej: sin elementos fluxivos articulares">
+          </label>
+          <div class="field-with-check">
+            <label>PNM
+              <input data-field="pnm" placeholder="Ej: sin focalidad neurológica">
+            </label>
+            <label class="check"><input type="checkbox" data-field="pnmNormal"> Normal</label>
+          </div>
+          <div class="field-with-check">
+            <label>FFLL
+              <input data-field="ffll" placeholder="Ej: libres e indoloras">
+            </label>
+            <label class="check"><input type="checkbox" data-field="ffllNormal"> Normal</label>
+          </div>
+          <label>Otros EF
+            <input data-field="otrosEf" placeholder="Otro hallazgo del examen físico">
+          </label>
+        </div>
+
+        <div class="ecg-options is-disabled">
+          <label class="check"><input type="checkbox" data-field="incluirEcg"> ECG</label>
+          <label class="check"><input type="checkbox" data-field="ecgNormal" checked disabled> Normal</label>
+          <label class="ecg-editor-label">
+            <span class="ecg-normal-editor" aria-label="Descripción normal del ECG; solo la frecuencia cardíaca es editable">
+              ECG: RS <input data-field="ecgFrecuencia" value="80" inputmode="numeric" aria-label="Frecuencia cardíaca del ECG" disabled> lpm, intervalo PR de duración normal, QRS fino, sin alteraciones del ST ni otros signos de isquemia aguda.
+            </span>
+          </label>
+          <label class="ecg-editor-label" hidden>
+            <textarea class="ecg-custom-editor" data-field="ecgDescripcion" aria-label="Descripción del ECG" placeholder="ECG: describa ritmo, frecuencia, intervalos, QRS, ST y otros hallazgos" disabled></textarea>
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2>En suma</h2>
+        <label>Resumen del caso
+          <textarea data-field="enSuma" placeholder="Ej: SM, 76 años, HTA, DM2, que ingresa por..."></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>Planteo diagnóstico</h2>
+        <label>Planteo diagnóstico
+          <textarea data-field="planteoDiagnostico" placeholder="Un planteo por línea. Ej: NAC, insuficiencia cardíaca descompensada"></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>Evolución en sala</h2>
+        <label>Evolución en sala
+          <textarea data-field="evolucionSala" placeholder="Primera evolución en sala: estado actual, paraclínica, interconsultas, procedimientos, etc."></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>Conducta</h2>
+        <label>Conducta
+          <textarea data-field="conducta" placeholder="Paraclínica a solicitar, tratamiento, interconsultas, controles, etc."></textarea>
+        </label>
+      </section>
+    </form>
+
+    <aside class="column preview-column">
+      <div class="preview-top">
+        <strong>Texto generado</strong>
+        <span class="status" id="status">Listo para copiar</span>
+      </div>
+      <pre id="historia"></pre>
+    </aside>
+  </main>
+
+  <div class="suggestion-strip">
+    <a class="suggestion-link" href="contacto.html#contacto">¿Tenés alguna sugerencia?</a>
+  </div>
+
+  <div class="suggestion-strip">
+    <a class="suggestion-link coffee-link" href="https://buymeacoffee.com/santiago.saralegui" target="_blank" rel="noopener noreferrer">☕ Invitame un café</a>
+  </div>
+
+  <footer>
+    Desarrollado por Dr. Santiago Saralegui · <a href="contacto.html">Contacto profesional</a>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    const { value, sentence, endDot, lines, bullets } = HF;
+
+    function enfermedadActualTexto() {
+      const items = [];
+      if (value("enfermedad")) items.push(value("enfermedad"));
+      if (value("cardioNegativo")) items.push("No dolor torácico, no palpitaciones, no síncope, no mareos");
+      if (value("respNegativo")) items.push("No disnea, no dolor tipo puntada de lado");
+      if (value("noFiebreChuchos")) items.push("No fiebre, no chuchos de frío");
+      if (value("transitoNormal")) items.push("Tránsito sin alteraciones");
+      return items.map(endDot).join(" ");
+    }
+
+    // Un solo planteo va en la misma línea; varios, como lista.
+    function planteoTexto() {
+      const items = lines(value("planteoDiagnostico"));
+      if (items.length <= 1) return items.length ? `Planteo diagnóstico: ${items[0]}` : "";
+      return bullets("Planteo diagnóstico", items);
+    }
+
+    // Párrafo con etiqueta a partir de un campo de varias líneas.
+    function parrafo(label, fieldName) {
+      return sentence(label, lines(value(fieldName)).map(endDot).join(" "));
+    }
+
+    // Examen físico con su título y, debajo, el ECG de ese examen si está marcado.
+    function examenTexto(titulo, prefix) {
+      const examen = HF.examenAdulto(prefix);
+      return [examen ? `${titulo}:\n${examen}` : "", HF.ecgTexto(prefix)].filter(Boolean).join("\n\n");
+    }
+
+    function buildHistoria() {
+      const fichaParts = [];
+      if (value("sexoF")) fichaParts.push("SF");
+      if (value("sexoM")) fichaParts.push("SM");
+      if (value("edad")) fichaParts.push(HF.edadTexto(value("edad")));
+      if (value("trabajo")) fichaParts.push(value("trabajo"));
+      if (value("procedencia")) fichaParts.push(`procedente de ${value("procedencia")}`);
+      if (value("autovalido")) fichaParts.push("autoválido");
+      if (value("dependiente")) fichaParts.push("dependiente");
+      if (value("institucionalizado")) fichaParts.push(value("sexoF") ? "institucionalizada" : "institucionalizado");
+
+      const apExtra = [];
+      if (value("habitos")) apExtra.push(`Hábitos: ${value("habitos")}`);
+      apExtra.push(...HF.alergiaItems());
+
+      return [
+        fichaParts.length ? `FP: ${fichaParts.join(", ")}.` : "",
+        HF.antecedentesTexto(apExtra),
+        sentence("AF", value("af")),
+        sentence("MC", value("motivoConsulta")),
+        sentence("EA", enfermedadActualTexto()),
+        examenTexto("Examen físico en emergencia", "em"),
+        parrafo("Evolución en emergencia", "enEmergencia"),
+        sentence("MI", value("motivoIngreso")),
+        examenTexto("Examen físico en sala", ""),
+        parrafo("En suma", "enSuma"),
+        planteoTexto(),
+        parrafo("Evolución en sala", "evolucionSala"),
+        bullets("Conducta", lines(value("conducta")))
+      ].filter(Boolean).join("\n\n");
+    }
+
+    // Esta página no tiene plantillas ni botón "Plantillas": los ingresos suelen ser casos complejos.
+
+    // Los signos vitales del examen en emergencia se resaltan con los mismos criterios.
+    const vitalChecks = { ...HF.VITALES_ADULTO };
+    Object.entries(HF.VITALES_ADULTO).forEach(([name, check]) => {
+      vitalChecks[`em${name[0].toUpperCase()}${name.slice(1)}`] = check;
+    });
+
+    HF.init({
+      draftKey: "historiafacil:borrador:ingreso",
+      fileName: "historia-clinica-ingreso.txt",
+      buildHistoria,
+      vitalChecks
+    });
+  </script>
+</body>
+</html>

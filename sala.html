@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evolución en sala | Dr. Santiago Saralegui</title>
+  <meta name="description" content="Herramienta web para escribir evoluciones de pacientes internados en sala de forma rápida, ordenada y lista para copiar. Desarrollada por Dr. Santiago Saralegui.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Dr. Santiago Saralegui">
+  <meta property="og:title" content="Evolución en sala">
+  <meta property="og:description" content="Generador rápido de evoluciones en sala para profesionales de la salud.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon-64.png" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    const GA_MEASUREMENT_ID = "G-SN3JTPR3M0";
+    if (GA_MEASUREMENT_ID) {
+      const gaScript = document.createElement("script");
+      gaScript.async = true;
+      gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+      document.head.appendChild(gaScript);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", GA_MEASUREMENT_ID);
+    }
+  </script>
+</head>
+<body class="page-index" data-page="sala.html">
+  <header>
+    <div class="page-menu" id="pageMenu">
+      <h1><button class="page-toggle" id="pageToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="pageList">Evolución en sala <span class="page-caret" aria-hidden="true">▾</span></button></h1>
+      <div class="template-list page-list" id="pageList" role="menu" hidden></div>
+    </div>
+    <nav class="top-menu" aria-label="Opciones">
+      <a class="menu-item" href="contacto.html">Contacto profesional</a>
+    </nav>
+    <div class="header-actions">
+      <button class="button" id="copyTop" type="button">Copiar historia</button>
+      <button class="button secondary" id="downloadTxt" type="button">Descargar TXT</button>
+      <button class="button warn" id="clearAll" type="button">Limpiar</button>
+    </div>
+  </header>
+
+  <main>
+    <form class="column form-column" id="hcForm" autocomplete="off">
+      <section>
+        <h2>En suma</h2>
+        <label>Resumen del caso
+          <textarea data-field="enSuma" placeholder="Ej: SM, 76 años, HTA, DM2, cursando día 3 de internación por NAC"></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>Evolución en sala</h2>
+        <label>Evolución
+          <textarea data-field="evolucion" placeholder="Síntomas, cambios desde la última evolución, eventos de las últimas 24 horas, etc."></textarea>
+        </label>
+        <div class="check-row">
+          <label class="check"><input type="checkbox" data-field="apirexia"> En apirexia</label>
+          <label class="check"><input type="checkbox" data-field="sinDolor"> Sin dolor</label>
+          <label class="check"><input type="checkbox" data-field="descanso"> Buen descanso nocturno</label>
+          <label class="check"><input type="checkbox" data-field="toleraVO" checked> Tolera vía oral</label>
+          <label class="check"><input type="checkbox" data-field="transitoNormal" checked> Tránsitos sin alteraciones</label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Examen físico</h2>
+        <div class="grid three">
+          <label>PA
+            <input data-field="pa" placeholder="Ej: 130/80">
+          </label>
+          <label>FC
+            <input data-field="fc" value="80">
+          </label>
+          <label>FR
+            <input data-field="fr" placeholder="Ej: 18">
+          </label>
+          <label>SatO2
+            <input data-field="sat" placeholder="Ej: 98% VEA">
+          </label>
+          <label>Temperatura
+            <input data-field="temp" placeholder="Ej: 36,8 °C">
+          </label>
+          <label>HGT
+            <input data-field="hgt" placeholder="Ej: 112 mg/dL">
+          </label>
+        </div>
+        <label>Diuresis
+          <input data-field="diuresis" placeholder="Ej: 1500 ml en 24 horas, conservada">
+        </label>
+        <label>General
+          <input data-field="general" value="Lúcido">
+        </label>
+        <label>Piel y mucosas
+          <input data-field="pym" value="BHyP">
+        </label>
+        <div class="grid">
+          <label>CV
+            <input data-field="cv" value="RR, RBG, SL">
+          </label>
+          <label>MMII
+            <input data-field="mmii" placeholder="Ej: sin edemas en MMII">
+          </label>
+        </div>
+        <label>PP
+          <input data-field="pp" value="MAV + bilateral, sin estertores">
+        </label>
+        <div class="grid">
+          <div class="field-with-check">
+            <label>ABD
+              <input data-field="abd" placeholder="Ej: blando, depresible, indoloro, RHA +">
+            </label>
+            <label class="check"><input type="checkbox" data-field="abdNormal"> Normal</label>
+          </div>
+          <div class="field-with-check">
+            <label>PNM
+              <input data-field="pnm" placeholder="Ej: sin focalidad neurológica">
+            </label>
+            <label class="check"><input type="checkbox" data-field="pnmNormal"> Normal</label>
+          </div>
+        </div>
+        <label>Otros EF
+          <input data-field="otrosEf" placeholder="Otro hallazgo del examen físico">
+        </label>
+      </section>
+
+      <section>
+        <h2>Paraclínica, interconsultas o procedimientos</h2>
+        <label>Estudios, resultados e interconsultas
+          <textarea data-field="paraclinica" placeholder="Ej: laboratorio del día, imágenes, cultivos, interconsultas, etc."></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>Conducta</h2>
+        <label>Conducta
+          <textarea data-field="conducta" placeholder="Cambios de tratamiento, paraclínica a solicitar, interconsultas, etc."></textarea>
+        </label>
+        <div class="check-row">
+          <label class="check"><input type="checkbox" data-field="igualConducta"> Se mantiene conducta</label>
+        </div>
+      </section>
+    </form>
+
+    <aside class="column preview-column">
+      <div class="preview-top">
+        <strong>Texto generado</strong>
+        <span class="status" id="status">Listo para copiar</span>
+      </div>
+      <pre id="historia"></pre>
+    </aside>
+  </main>
+
+  <div class="suggestion-strip">
+    <a class="suggestion-link" href="contacto.html#contacto">¿Tenés alguna sugerencia?</a>
+  </div>
+
+  <div class="suggestion-strip">
+    <a class="suggestion-link coffee-link" href="https://buymeacoffee.com/santiago.saralegui" target="_blank" rel="noopener noreferrer">☕ Invitame un café</a>
+  </div>
+
+  <footer>
+    Desarrollado por Dr. Santiago Saralegui · <a href="contacto.html">Contacto profesional</a>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    const { value, sentence, endDot, lines, bullets } = HF;
+
+    function evolucionTexto() {
+      const items = [];
+      if (value("evolucion")) items.push(value("evolucion"));
+      if (value("apirexia")) items.push("En apirexia");
+      if (value("sinDolor")) items.push("Sin dolor");
+      if (value("descanso")) items.push("Buen descanso nocturno");
+      if (value("toleraVO")) items.push("Tolera vía oral");
+      if (value("transitoNormal")) items.push("Tránsitos digestivo y urinario sin alteraciones");
+      return items.map(endDot).join(" ");
+    }
+
+    function buildHistoria() {
+      const examen = [HF.examenAdulto(), sentence("Diuresis", value("diuresis"))].filter(Boolean).join("\n");
+
+      const conducta = lines(value("conducta"));
+      if (value("igualConducta")) conducta.push("Se mantiene conducta");
+
+      return [
+        // "En suma" y la evolución van sin etiqueta; si "En suma" queda vacío, no aparece.
+        lines(value("enSuma")).map(endDot).join(" "),
+        evolucionTexto(),
+        examen ? `Examen físico:\n${examen}` : "",
+        lines(value("paraclinica")).map(endDot).join("\n"),
+        bullets("Conducta", conducta)
+      ].filter(Boolean).join("\n\n");
+    }
+
+    // Esta página no tiene plantillas ni botón "Plantillas".
+
+    HF.init({
+      draftKey: "historiafacil:borrador:sala",
+      fileName: "evolucion-en-sala.txt",
+      buildHistoria,
+      vitalChecks: HF.VITALES_ADULTO
+    });
+  </script>
+</body>
+</html>

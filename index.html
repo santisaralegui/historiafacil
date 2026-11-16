@@ -30,9 +30,12 @@
     }
   </script>
 </head>
-<body class="page-index">
+<body class="page-index" data-page="index.html">
   <header>
-    <h1>Historia clínica de emergencia</h1>
+    <div class="page-menu" id="pageMenu">
+      <h1><button class="page-toggle" id="pageToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="pageList">Historia clínica de emergencia <span class="page-caret" aria-hidden="true">▾</span></button></h1>
+      <div class="template-list page-list" id="pageList" role="menu" hidden></div>
+    </div>
     <nav class="top-menu" aria-label="Opciones">
       <a class="menu-item" href="contacto.html">Contacto profesional</a>
     </nav>
@@ -239,63 +242,9 @@
     Desarrollado por Dr. Santiago Saralegui · <a href="contacto.html">Contacto profesional</a>
   </footer>
 
+  <script src="app.js"></script>
   <script>
-    const form = document.getElementById("hcForm");
-    const preview = document.getElementById("historia");
-    const status = document.getElementById("status");
-    const antecedentesBox = document.getElementById("antecedentes");
-    const alergiasInput = document.querySelector("[data-field='alergias']");
-    const sinAlergias = document.querySelector("[data-field='sinAlergias']");
-    const incluirEcg = document.querySelector("[data-field='incluirEcg']");
-    const ecgNormal = document.querySelector("[data-field='ecgNormal']");
-    const ecgOptions = document.getElementById("ecgOptions");
-    const ecgNormalEditorLabel = document.getElementById("ecgNormalEditorLabel");
-    const ecgDescripcionLabel = document.getElementById("ecgDescripcionLabel");
-
-    function ecgNormalDescripcion() {
-      const frecuencia = value("ecgFrecuencia") || "80";
-      return `RS ${frecuencia} lpm, intervalo PR de duración normal, QRS fino, sin alteraciones del ST ni otros signos de isquemia aguda`;
-    }
-
-    function value(name) {
-      const el = document.querySelector(`[data-field="${name}"]`);
-      if (!el) return "";
-      if (el.type === "checkbox" || el.type === "radio") return el.checked;
-      return el.value.trim();
-    }
-
-    function compact(items) {
-      return items.filter(Boolean).join(". ");
-    }
-
-    function sentence(label, text) {
-      if (!text) return "";
-      return `${label}: ${text}${/[.!?]$/.test(text) ? "" : "."}`;
-    }
-
-    function line(label, parts) {
-      const text = parts.filter(Boolean).join(", ");
-      return sentence(label, text);
-    }
-
-    function edadTexto(text) {
-      if (!text) return "";
-      return /\baños?\b/i.test(text) ? text : `${text} años`;
-    }
-
-    function fieldOrNormal(fieldName, checkboxName, normalText) {
-      return value(fieldName) || (value(checkboxName) ? normalText : "");
-    }
-
-    function frTexto() {
-      const raw = value("fr");
-      if (!raw) return "eupneico";
-      const normalized = raw.replace(",", ".");
-      const match = normalized.match(/\d+(?:\.\d+)?/);
-      const number = match ? Number(match[0]) : NaN;
-      if (Number.isFinite(number) && number >= 20) return `polipnea de ${raw} rpm`;
-      return `FR ${raw} rpm`;
-    }
+    const { value, sentence, endDot, lines, bullets } = HF;
 
     function enfermedadActualTexto() {
       const items = [];
@@ -304,103 +253,23 @@
       if (value("respNegativo")) items.push("No disnea, no dolor tipo puntada de lado");
       if (value("noFiebreChuchos")) items.push("No fiebre, no chuchos de frío");
       if (value("transitoNormal")) items.push("Tránsito sin alteraciones");
-      return items.map((item) => `${item}${/[.!?]$/.test(item) ? "" : "."}`).join(" ");
+      return items.map(endDot).join(" ");
     }
 
     function conductaTexto() {
-      const items = [];
-      const text = value("conducta");
-      if (text) {
-        items.push(...text.split(/\n+/).map((item) => item.trim()).filter(Boolean));
-      }
+      const items = lines(value("conducta"));
       if (value("reconsultaAlta")) {
         items.push("Se explican signos de reconsulta");
         items.push("Alta");
       }
-      if (!items.length) return "";
-      return `Conducta:\n${items.map((item) => `- ${item}${/[.!?]$/.test(item) ? "" : "."}`).join("\n")}`;
-    }
-
-    function paraclinicaTexto() {
-      const text = value("paraclinica");
-      if (!text) return "";
-      const items = text.split(/\n+/).map((item) => item.trim()).filter(Boolean);
-      return items.map((item) => `${item}${/[.!?]$/.test(item) ? "" : "."}`).join("\n");
-    }
-
-    function ecgTexto() {
-      if (!value("incluirEcg")) return "";
-      if (!value("ecgNormal")) return sentence("ECG", value("ecgDescripcion"));
-      return sentence("ECG", ecgNormalDescripcion());
-    }
-
-    function addAntecedente(data = {}) {
-      const row = document.createElement("div");
-      row.className = "antecedente-row";
-      row.innerHTML = `
-        <label>Antecedente
-          <input class="ap-name" name="ap-name-${Date.now()}-${antecedentesBox.children.length}" autocomplete="off" placeholder="Ej: DM2, HTA, FA" value="${escapeAttr(data.name || "")}">
-        </label>
-        <label>Tratamiento
-          <input class="ap-treatment" name="ap-treatment-${Date.now()}-${antecedentesBox.children.length}" autocomplete="off" placeholder="Ej: metformina, losartán" value="${escapeAttr(data.treatment || "")}">
-        </label>
-        <label>Otros
-          <input class="ap-other" name="ap-other-${Date.now()}-${antecedentesBox.children.length}" autocomplete="off" placeholder="Ej: repercusiones crónicas" value="${escapeAttr(data.other || "")}">
-        </label>
-        <button class="mini-btn" type="button" title="Quitar antecedente">×</button>
-      `;
-
-      row.querySelector(".mini-btn").addEventListener("click", () => {
-        row.remove();
-        if (!antecedentesBox.children.length) addAntecedente();
-        update();
-      });
-
-      row.querySelectorAll("input").forEach((input) => {
-        input.addEventListener("input", update);
-        input.addEventListener("keydown", (event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            const next = addAntecedente();
-            next.querySelector(".ap-name").focus();
-          }
-        });
-      });
-
-      antecedentesBox.appendChild(row);
-      return row;
-    }
-
-    function escapeAttr(text) {
-      return String(text).replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
-    }
-
-    function antecedentesItems() {
-      const rows = [...antecedentesBox.querySelectorAll(".antecedente-row")];
-      return rows.map((row) => {
-        const name = row.querySelector(".ap-name").value.trim();
-        const treatment = row.querySelector(".ap-treatment").value.trim();
-        const other = row.querySelector(".ap-other").value.trim();
-        if (!name) return "";
-        const details = [];
-        if (treatment) details.push(`en tratamiento con ${treatment}`);
-        if (other) details.push(other);
-        return details.length ? `${name} ${details.join(", ")}` : name;
-      }).filter(Boolean);
-    }
-
-    function antecedentesTexto(extraItems = []) {
-      const apItems = antecedentesItems();
-      const items = [...(apItems.length ? apItems : ["Sin antecedentes a destacar"]), ...extraItems];
-      if (!items.length) return "";
-      return `AP:\n${items.map((item) => `- ${item}${/[.!?]$/.test(item) ? "" : "."}`).join("\n")}`;
+      return bullets("Conducta", items);
     }
 
     function buildHistoria() {
       const fichaParts = [];
       if (value("sexoF")) fichaParts.push("SF");
       if (value("sexoM")) fichaParts.push("SM");
-      if (value("edad")) fichaParts.push(edadTexto(value("edad")));
+      if (value("edad")) fichaParts.push(HF.edadTexto(value("edad")));
       if (value("trabajo")) fichaParts.push(value("trabajo"));
       if (value("procedencia")) fichaParts.push(`procedente de ${value("procedencia")}`);
       if (value("acompanante")) fichaParts.push(`acompañado por ${value("acompanante")}`);
@@ -408,233 +277,18 @@
       if (value("dependiente")) fichaParts.push("dependiente");
       if (value("institucionalizado")) fichaParts.push(value("sexoF") ? "institucionalizada" : "institucionalizado");
 
-      const ficha = fichaParts.length ? `FP: ${fichaParts.join(", ")}.` : "";
+      const examen = HF.examenAdulto();
 
-      const alergiaItems = [];
-      if (value("sinAlergias")) {
-        alergiaItems.push("Sin alergias medicamentosas conocidas");
-      } else if (value("alergias")) {
-        alergiaItems.push(`Alergias: ${value("alergias")}`);
-      }
-
-      const antecedentes = antecedentesTexto(alergiaItems);
-
-      const generalParts = [value("general")];
-      if (value("hgt")) generalParts.push(`HGT ${value("hgt")}`);
-
-      const pymParts = [value("pym")];
-      if (value("temp")) pymParts.push(`Tax ${value("temp")}`);
-
-      const cvParts = [];
-      if (value("pa")) cvParts.push(`PA ${value("pa")} mmHg`);
-      if (value("fc")) cvParts.push(`FC ${value("fc")} cpm`);
-      if (value("cv")) cvParts.push(value("cv"));
-
-      const ppParts = [];
-      ppParts.push(frTexto());
-      if (value("sat")) ppParts.push(`SatO2 ${value("sat")}`);
-      if (value("pp")) ppParts.push(value("pp"));
-
-      const examen = [
-        generalParts.filter(Boolean).join(", ") ? `${generalParts.filter(Boolean).join(", ")}.` : "",
-        line("PyM", pymParts),
-        line("CV", cvParts),
-        line("PP", ppParts),
-        sentence("MMII", value("mmii")),
-        sentence("ABD", fieldOrNormal("abd", "abdNormal", "Blando, depresible, indoloro, RHA +")),
-        sentence("LG", fieldOrNormal("lg", "lgNormal", "Sin adenomegalias")),
-        sentence("OA", value("oa")),
-        sentence("PNM", fieldOrNormal("pnm", "pnmNormal", "Glasgow 15, pupilas reactivas y simétricas, sin síndrome focal neurológico, sin rigidez de nuca")),
-        sentence("FFLL", fieldOrNormal("ffll", "ffllNormal", "Libres e indoloras")),
-        value("otrosEf") ? `${value("otrosEf")}${/[.!?]$/.test(value("otrosEf")) ? "" : "."}` : ""
-      ].filter(Boolean).join("\n");
-
-      const blocks = [
-        ficha,
-        antecedentes,
+      return [
+        fichaParts.length ? `FP: ${fichaParts.join(", ")}.` : "",
+        HF.antecedentesTexto(HF.alergiaItems()),
         sentence("EA", enfermedadActualTexto()),
         examen ? `Examen físico:\n${examen}` : "",
-        ecgTexto(),
-        paraclinicaTexto(),
+        HF.ecgTexto(),
+        lines(value("paraclinica")).map(endDot).join("\n"),
         value("planteoDiagnostico") ? `Planteo diagnóstico: ${value("planteoDiagnostico")}` : "",
         conductaTexto()
-      ].filter(Boolean);
-
-      return blocks.join("\n\n");
-    }
-
-    function numbersIn(text) {
-      return (text.replace(/,/g, ".").match(/\d+(?:\.\d+)?/g) || []).map(Number);
-    }
-
-    // Devuelve el hallazgo anormal de cada signo vital, o "" si está en rango.
-    const VITAL_CHECKS = {
-      pa(text) {
-        // Formato sistólica/diastólica; no se evalúa hasta que ambas estén escritas.
-        const match = text.match(/(\d+)\s*\/\s*(\d+)/);
-        if (!match) return "";
-        const sistolica = Number(match[1]);
-        const diastolica = Number(match[2]);
-        if (sistolica < 90) return "Hipotensión";
-        if (sistolica >= 140 || diastolica >= 90) return "Hipertensión";
-        return "";
-      },
-      fc(text) {
-        const [fc] = numbersIn(text);
-        if (fc === undefined) return "";
-        if (fc < 60) return "Bradicardia";
-        if (fc > 100) return "Taquicardia";
-        return "";
-      },
-      fr(text) {
-        const [fr] = numbersIn(text);
-        if (fr === undefined) return "";
-        if (fr < 12) return "Bradipnea";
-        if (fr >= 20) return "Polipnea";
-        return "";
-      },
-      sat(text) {
-        const [sat] = numbersIn(text);
-        if (sat === undefined) return "";
-        return sat < 94 ? "Desaturación" : "";
-      },
-      temp(text) {
-        const [temp] = numbersIn(text);
-        if (temp === undefined) return "";
-        return temp >= 38 ? "Fiebre" : "";
-      },
-      hgt(text) {
-        const [hgt] = numbersIn(text);
-        if (hgt === undefined) return "";
-        if (hgt < 70) return "Hipoglucemia";
-        if (hgt > 180) return "Hiperglucemia";
-        return "";
-      }
-    };
-
-    function updateVitalAlerts() {
-      Object.entries(VITAL_CHECKS).forEach(([field, check]) => {
-        const input = document.querySelector(`[data-field="${field}"]`);
-        let alert = input.parentElement.querySelector(".vital-alert");
-        if (!alert) {
-          alert = document.createElement("span");
-          alert.className = "vital-alert";
-          input.after(alert);
-        }
-        const finding = check(input.value.trim());
-        input.classList.toggle("is-abnormal", Boolean(finding));
-        alert.textContent = finding;
-        alert.hidden = !finding;
-      });
-    }
-
-    function update() {
-      updateVitalAlerts();
-      preview.textContent = buildHistoria() || "Complete campos a la izquierda para generar la historia clínica.";
-      const disabled = sinAlergias.checked;
-      alergiasInput.disabled = disabled;
-      if (disabled) alergiasInput.value = "";
-      ecgOptions.classList.toggle("is-disabled", !incluirEcg.checked);
-      ecgNormal.disabled = !incluirEcg.checked;
-      document.querySelector("[data-field='ecgFrecuencia']").disabled = !incluirEcg.checked || !ecgNormal.checked;
-      document.querySelector("[data-field='ecgDescripcion']").disabled = !incluirEcg.checked || ecgNormal.checked;
-      ecgNormalEditorLabel.hidden = !ecgNormal.checked;
-      ecgDescripcionLabel.hidden = ecgNormal.checked;
-      status.textContent = "Actualizado";
-      status.className = "status";
-      saveDraft();
-    }
-
-    // Borrador guardado en este navegador para no perder lo escrito si se cierra la página.
-    // Se descarta pasadas DRAFT_MAX_AGE_MS para no mostrar datos de otro paciente en equipos compartidos.
-    const DRAFT_KEY = "historiafacil:borrador";
-    const DRAFT_MAX_AGE_MS = 12 * 60 * 60 * 1000;
-
-    function saveDraft() {
-      const fields = {};
-      form.querySelectorAll("[data-field]").forEach((el) => {
-        fields[el.dataset.field] = el.type === "checkbox" || el.type === "radio" ? el.checked : el.value;
-      });
-      const antecedentes = [...antecedentesBox.querySelectorAll(".antecedente-row")].map((row) => ({
-        name: row.querySelector(".ap-name").value,
-        treatment: row.querySelector(".ap-treatment").value,
-        other: row.querySelector(".ap-other").value
-      }));
-      try {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify({ savedAt: Date.now(), fields, antecedentes }));
-      } catch {}
-    }
-
-    function restoreDraft() {
-      let draft;
-      try {
-        draft = JSON.parse(localStorage.getItem(DRAFT_KEY));
-      } catch {
-        return false;
-      }
-      if (!draft || !draft.fields || Date.now() - draft.savedAt > DRAFT_MAX_AGE_MS) return false;
-      Object.entries(draft.fields).forEach(([field, fieldValue]) => {
-        const el = form.querySelector(`[data-field="${field}"]`);
-        if (!el) return;
-        if (el.type === "checkbox" || el.type === "radio") el.checked = Boolean(fieldValue);
-        else el.value = fieldValue;
-      });
-      antecedentesBox.innerHTML = "";
-      (draft.antecedentes || []).forEach((data) => addAntecedente(data));
-      if (!antecedentesBox.children.length) addAntecedente();
-      return true;
-    }
-
-    async function copyHistoria() {
-      const text = buildHistoria();
-      if (!text) return;
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch {
-        const temp = document.createElement("textarea");
-        temp.value = text;
-        document.body.appendChild(temp);
-        temp.select();
-        document.execCommand("copy");
-        temp.remove();
-      }
-      status.textContent = "Copiado al portapapeles";
-      status.className = "status toast";
-    }
-
-    function downloadTxt() {
-      const text = buildHistoria();
-      if (!text) return;
-      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "historia-clinica-emergencia.txt";
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function clearAll() {
-      if (!confirm("¿Limpiar todos los campos?")) return;
-      resetForm();
-    }
-
-    function resetForm() {
-      form.reset();
-      antecedentesBox.innerHTML = "";
-      addAntecedente();
-      document.querySelector("[data-field='funcionalidadNoConsignar']").checked = true;
-      document.querySelector("[data-field='sinAlergias']").checked = true;
-      document.querySelector("[data-field='noFiebreChuchos']").checked = true;
-      document.querySelector("[data-field='transitoNormal']").checked = true;
-      document.querySelector("[data-field='fc']").value = "80";
-      document.querySelector("[data-field='general']").value = "Lúcido";
-      document.querySelector("[data-field='pym']").value = "BHyP";
-      document.querySelector("[data-field='cv']").value = "RR, RBG, SL";
-      document.querySelector("[data-field='pp']").value = "MAV + bilateral, sin estertores";
-      document.querySelector("[data-field='ecgFrecuencia']").value = "80";
-      ecgNormal.checked = true;
-      update();
+      ].filter(Boolean).join("\n\n");
     }
 
     const TEMPLATES = {
@@ -737,163 +391,13 @@
       }
     };
 
-    function applyTemplate(name) {
-      const template = TEMPLATES[name];
-      if (!template) return;
-      resetForm();
-      Object.entries(template).forEach(([field, fieldValue]) => {
-        if (field === "label") return;
-        const el = document.querySelector(`[data-field="${field}"]`);
-        if (!el) return;
-        if (el.type === "checkbox" || el.type === "radio") el.checked = fieldValue;
-        else el.value = fieldValue;
-      });
-      update();
-      const enfermedad = document.querySelector("[data-field='enfermedad']");
-      const blank = enfermedad.value.indexOf("___");
-      if (blank !== -1) {
-        enfermedad.focus();
-        enfermedad.setSelectionRange(blank, blank + 3);
-      }
-    }
-
-    let expandedEditor = null;
-
-    function closeExpandedEditor() {
-      if (!expandedEditor) return;
-      expandedEditor.remove();
-      expandedEditor = null;
-    }
-
-    function openExpandedEditor(input, keepCaret = false) {
-      if (expandedEditor?.source === input) return;
-      closeExpandedEditor();
-      // Posición del cursor en el campo original (null en tipos que no la soportan, p. ej. number)
-      let caretStart = null;
-      let caretEnd = null;
-      if (keepCaret) {
-        try {
-          caretStart = input.selectionStart;
-          caretEnd = input.selectionEnd;
-        } catch (error) {
-          caretStart = caretEnd = null;
-        }
-      }
-      const editor = document.createElement("textarea");
-      const rect = input.getBoundingClientRect();
-      editor.className = "expanded-editor";
-      editor.value = input.value;
-      editor.placeholder = input.placeholder;
-      editor.source = input;
-      const editorWidth = Math.min(520, window.innerWidth - 24);
-      editor.style.left = `${Math.max(12, Math.min(rect.left, window.innerWidth - editorWidth - 12))}px`;
-      editor.style.top = `${Math.min(rect.bottom + 6, window.innerHeight - 132)}px`;
-      editor.addEventListener("input", () => {
-        input.value = editor.value.replace(/\n+/g, " ");
-        input.dispatchEvent(new Event("input", { bubbles: true }));
-      });
-      editor.addEventListener("blur", closeExpandedEditor);
-      document.body.appendChild(editor);
-      expandedEditor = editor;
-      editor.focus();
-      if (caretStart === null || caretEnd === null) {
-        caretStart = caretEnd = editor.value.length;
-      }
-      editor.setSelectionRange(caretStart, caretEnd);
-    }
-
-    form.addEventListener("focusin", (event) => {
-      const input = event.target;
-      if (expandedEditor && input !== expandedEditor && input !== expandedEditor.source) closeExpandedEditor();
-      if (input.matches("input:not([type='checkbox']):not([type='radio'])") && input.scrollWidth > input.clientWidth) {
-        openExpandedEditor(input);
-      }
+    HF.init({
+      draftKey: "historiafacil:borrador",
+      fileName: "historia-clinica-emergencia.txt",
+      buildHistoria,
+      templates: TEMPLATES,
+      vitalChecks: HF.VITALES_ADULTO
     });
-
-    form.addEventListener("input", (event) => {
-      const input = event.target;
-      if (input.matches("input:not([type='checkbox']):not([type='radio'])") && input.scrollWidth > input.clientWidth) {
-        openExpandedEditor(input, true);
-      }
-    });
-
-    incluirEcg.addEventListener("change", () => {
-      if (incluirEcg.checked) ecgNormal.checked = true;
-      update();
-    });
-
-    ecgNormal.addEventListener("change", () => {
-      if (!ecgNormal.checked && !value("ecgDescripcion")) {
-        document.querySelector("[data-field='ecgDescripcion']").value = ecgNormalDescripcion();
-      }
-      update();
-    });
-
-    document.getElementById("copyTop").addEventListener("click", copyHistoria);
-    document.getElementById("downloadTxt").addEventListener("click", downloadTxt);
-    document.getElementById("clearAll").addEventListener("click", clearAll);
-    const templateMenu = document.getElementById("templateMenu");
-    const templateToggle = document.getElementById("templateToggle");
-    const templateList = document.getElementById("templateList");
-
-    function setTemplateMenuOpen(open) {
-      templateList.hidden = !open;
-      templateToggle.setAttribute("aria-expanded", String(open));
-    }
-
-    Object.entries(TEMPLATES).forEach(([name, template]) => {
-      const item = document.createElement("button");
-      item.type = "button";
-      item.className = "template-item";
-      item.setAttribute("role", "menuitem");
-      item.textContent = template.label;
-      item.addEventListener("click", () => {
-        setTemplateMenuOpen(false);
-        applyTemplate(name);
-      });
-      templateList.appendChild(item);
-    });
-
-    templateToggle.addEventListener("click", () => setTemplateMenuOpen(templateList.hidden));
-    document.addEventListener("click", (event) => {
-      if (!templateMenu.contains(event.target)) setTemplateMenuOpen(false);
-    });
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && !templateList.hidden) {
-        setTemplateMenuOpen(false);
-        templateToggle.focus();
-      }
-    });
-    document.getElementById("addAntecedente").addEventListener("click", () => {
-      const row = addAntecedente();
-      row.querySelector(".ap-name").focus();
-      update();
-    });
-
-    form.addEventListener("input", update);
-    form.addEventListener("change", update);
-
-    function showReminder(text) {
-      const toast = document.createElement("div");
-      toast.className = "reminder-toast";
-      toast.setAttribute("role", "status");
-      toast.textContent = text;
-      document.body.appendChild(toast);
-      toast.getBoundingClientRect(); // fuerza el estilo inicial para que se anime la entrada
-      toast.classList.add("is-visible");
-      setTimeout(() => {
-        toast.classList.remove("is-visible");
-        toast.addEventListener("transitionend", () => toast.remove(), { once: true });
-      }, 5000);
-    }
-
-    // Texto de la página vacía, para avisar solo si el borrador restaurado tiene datos.
-    const emptyHistoria = buildHistoria();
-    if (!restoreDraft()) addAntecedente();
-    update();
-    if (buildHistoria() !== emptyHistoria) {
-      showReminder("Recordá limpiar la página antes de iniciar con un nuevo paciente");
-    }
   </script>
 </body>
 </html>

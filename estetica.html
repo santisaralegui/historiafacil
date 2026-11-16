@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historia clínica de medicina estética | Dr. Santiago Saralegui</title>
+  <meta name="description" content="Herramienta web para crear historias clínicas de medicina estética de forma rápida, ordenada y lista para copiar. Desarrollada por Dr. Santiago Saralegui.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Dr. Santiago Saralegui">
+  <meta property="og:title" content="Historia clínica de medicina estética">
+  <meta property="og:description" content="Generador rápido de historias clínicas de medicina estética para profesionales de la salud.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon-64.png" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    const GA_MEASUREMENT_ID = "G-SN3JTPR3M0";
+    if (GA_MEASUREMENT_ID) {
+      const gaScript = document.createElement("script");
+      gaScript.async = true;
+      gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+      document.head.appendChild(gaScript);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", GA_MEASUREMENT_ID);
+    }
+  </script>
+</head>
+<body class="page-index" data-page="estetica.html">
+  <header>
+    <div class="page-menu" id="pageMenu">
+      <h1><button class="page-toggle" id="pageToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="pageList">Medicina estética <span class="page-caret" aria-hidden="true">▾</span></button></h1>
+      <div class="template-list page-list" id="pageList" role="menu" hidden></div>
+    </div>
+    <nav class="top-menu" aria-label="Opciones">
+      <a class="menu-item" href="contacto.html">Contacto profesional</a>
+    </nav>
+    <div class="header-actions">
+      <div class="template-menu" id="templateMenu">
+        <button class="button secondary" id="templateToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="templateList">Plantillas ▾</button>
+        <div class="template-list" id="templateList" role="menu" hidden></div>
+      </div>
+      <button class="button" id="copyTop" type="button">Copiar historia</button>
+      <button class="button secondary" id="downloadTxt" type="button">Descargar TXT</button>
+      <button class="button warn" id="clearAll" type="button">Limpiar</button>
+    </div>
+  </header>
+
+  <main>
+    <form class="column form-column" id="hcForm" autocomplete="off">
+      <section>
+        <h2>Ficha patronímica</h2>
+        <div class="check-row">
+          <label class="check"><input type="radio" name="sexo" data-field="sexoF" value="F"> Sexo femenino</label>
+          <label class="check"><input type="radio" name="sexo" data-field="sexoM" value="M"> Sexo masculino</label>
+        </div>
+        <div class="grid">
+          <label>Edad
+            <input data-field="edad" placeholder="Ej: 45">
+          </label>
+          <label>Trabajo
+            <input data-field="trabajo" placeholder="Ej: docente, administrativa">
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Antecedentes personales</h2>
+        <div id="antecedentes"></div>
+        <button class="button secondary" id="addAntecedente" type="button">Agregar antecedente</button>
+        <p class="hint">Tab pasa al tratamiento. Enter agrega otra línea.</p>
+        <label class="after-hint">Hábitos
+          <input data-field="habitos" placeholder="Ej: no tabaquista, usa fotoprotector a diario">
+        </label>
+        <div class="check-row">
+          <label class="check"><input type="checkbox" data-field="noEmbarazo"> No embarazo ni lactancia</label>
+          <label class="check"><input type="checkbox" data-field="noAnticoagulantes"> No anticoagulantes ni antiagregantes</label>
+          <label class="check"><input type="checkbox" data-field="noAutoinmunes"> No enfermedades autoinmunes ni neuromusculares</label>
+          <label class="check"><input type="checkbox" data-field="noHerpes"> No herpes labial recurrente</label>
+          <label class="check"><input type="checkbox" data-field="noQueloides"> No tendencia a queloides</label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Alergias</h2>
+        <label class="check"><input type="checkbox" data-field="sinAlergias" checked> Sin alergias</label>
+        <label id="alergiasLabel">Alergias
+          <input data-field="alergias" placeholder="Ej: dipirona, penicilina">
+        </label>
+      </section>
+
+      <section>
+        <h2>Antecedentes estéticos</h2>
+        <div class="field-with-check">
+          <label>Procedimientos estéticos previos
+            <input data-field="previos" placeholder="Ej: toxina botulínica hace 6 meses, sin complicaciones">
+          </label>
+          <label class="check"><input type="checkbox" data-field="previosNormal"> Sin antecedentes</label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Motivo de consulta</h2>
+        <label>Motivo de consulta
+          <input data-field="motivoConsulta" placeholder="Ej: arrugas de expresión, pérdida de volumen labial">
+        </label>
+        <label>Motivación
+          <input data-field="motivacion" placeholder="Ej: evento social próximo, quiere verse más descansada">
+        </label>
+      </section>
+
+      <section>
+        <h2>Examen físico</h2>
+        <div class="check-row tep-row">
+          <label class="check"><input type="checkbox" data-field="examenClasico"> Examen físico clásico</label>
+        </div>
+        <div class="exam-panel" id="panelClasico" hidden>
+          <div class="grid three">
+            <label>PA
+              <input data-field="clPa" placeholder="Ej: 130/80">
+            </label>
+            <label>FC
+              <input data-field="clFc" value="80">
+            </label>
+            <label>FR
+              <input data-field="clFr" placeholder="Ej: 18">
+            </label>
+            <label>SatO2
+              <input data-field="clSat" placeholder="Ej: 98% VEA">
+            </label>
+            <label>Temperatura
+              <input data-field="clTemp" placeholder="Ej: 36,8 °C">
+            </label>
+            <label>HGT
+              <input data-field="clHgt" placeholder="Ej: 112 mg/dL">
+            </label>
+          </div>
+          <label>General
+            <input data-field="clGeneral" value="Lúcido">
+          </label>
+          <label>Piel y mucosas
+            <input data-field="clPym" value="BHyP">
+          </label>
+          <div class="grid">
+            <label>CV
+              <input data-field="clCv" value="RR, RBG, SL">
+            </label>
+            <label>MMII
+              <input data-field="clMmii" placeholder="Ej: sin edemas en MMII">
+            </label>
+          </div>
+          <label>PP
+            <input data-field="clPp" value="MAV + bilateral, sin estertores">
+          </label>
+          <div class="grid">
+            <div class="field-with-check">
+              <label>ABD
+                <input data-field="clAbd" placeholder="Ej: blando, depresible, indoloro, RHA +">
+              </label>
+              <label class="check"><input type="checkbox" data-field="clAbdNormal"> Normal</label>
+            </div>
+            <div class="field-with-check">
+              <label>LG
+                <input data-field="clLg" placeholder="Ej: sin adenomegalias">
+              </label>
+              <label class="check"><input type="checkbox" data-field="clLgNormal"> Normal</label>
+            </div>
+            <label>OA
+              <input data-field="clOa" placeholder="Ej: sin elementos fluxivos articulares">
+            </label>
+            <div class="field-with-check">
+              <label>PNM
+                <input data-field="clPnm" placeholder="Ej: sin focalidad neurológica">
+              </label>
+              <label class="check"><input type="checkbox" data-field="clPnmNormal"> Normal</label>
+            </div>
+            <div class="field-with-check">
+              <label>FFLL
+                <input data-field="clFfll" placeholder="Ej: libres e indoloras">
+              </label>
+              <label class="check"><input type="checkbox" data-field="clFfllNormal"> Normal</label>
+            </div>
+            <label>Otros EF
+              <input data-field="clOtrosEf" placeholder="Otro hallazgo del examen físico">
+            </label>
+          </div>
+        </div>
+        <div class="grid exam-gap">
+          <label>Fototipo (Fitzpatrick)
+            <input data-field="fototipo" placeholder="Ej: III">
+          </label>
+          <label>Piel
+            <input data-field="piel" placeholder="Ej: mixta, fotodaño leve">
+          </label>
+        </div>
+        <label>Tercio superior
+          <input data-field="tercioSuperior" placeholder="Ej: arrugas dinámicas frontales y glabelares">
+        </label>
+        <label>Tercio medio
+          <input data-field="tercioMedio" placeholder="Ej: pérdida de volumen malar, surco nasogeniano marcado">
+        </label>
+        <label>Tercio inferior
+          <input data-field="tercioInferior" placeholder="Ej: labios finos, líneas de marioneta">
+        </label>
+        <label>Corporal
+          <input data-field="corporal" placeholder="Ej: adiposidad localizada en abdomen, flacidez en brazos">
+        </label>
+        <label>Otros EF
+          <input data-field="otrosEf" placeholder="Otro hallazgo del examen físico">
+        </label>
+      </section>
+
+      <section>
+        <h2>Planteo diagnóstico</h2>
+        <label>Planteo diagnóstico
+          <input data-field="planteoDiagnostico" placeholder="Ej: arrugas dinámicas de tercio superior">
+        </label>
+      </section>
+
+      <section>
+        <h2>Procedimiento</h2>
+        <label>Procedimiento
+          <select data-field="procTipo">
+            <option value="">Sin procedimiento</option>
+            <option>Toxina botulínica</option>
+            <option>Ácido hialurónico</option>
+            <option>Bioestimulación</option>
+            <option>Mesoterapia</option>
+            <option>Corporal</option>
+            <option>Láser</option>
+            <option>Otro</option>
+          </select>
+        </label>
+        <div class="exam-panel" id="procCampos" hidden>
+          <label id="procDetalleLabel"><span>Tipo de procedimiento</span>
+            <input data-field="procDetalle">
+          </label>
+          <label id="procMarcaLabel"><span>Marca</span>
+            <input data-field="procMarca">
+          </label>
+          <label><span id="procZonaTexto">Zonas tratadas</span>
+            <input data-field="procZona" placeholder="Ej: glabela, frontal">
+          </label>
+          <div class="field-with-check" id="procCantidadFila">
+            <label><span id="procCantidadTexto">Cantidad</span>
+              <input data-field="procCantidad">
+            </label>
+            <label id="procUnidadLabel">Unidad
+              <select data-field="procUnidad">
+                <option>cc</option>
+                <option>jeringas</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <label>Detalles del procedimiento
+          <textarea data-field="procedimiento" placeholder="Técnica, anestesia, lote, etc."></textarea>
+        </label>
+        <div class="check-row">
+          <label class="check"><input type="checkbox" data-field="consentimiento"> Consentimiento informado firmado</label>
+          <label class="check"><input type="checkbox" data-field="bienTolerado"> Bien tolerado, sin complicaciones inmediatas</label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Indicaciones</h2>
+        <label>Indicaciones
+          <textarea data-field="indicaciones" placeholder="Cuidados posteriores, medicación, etc."></textarea>
+        </label>
+        <label>Control
+          <input data-field="control" placeholder="Ej: 15 días">
+        </label>
+        <div class="check-row">
+          <label class="check"><input type="checkbox" data-field="signosAlarma"> Se explican signos de alarma y reconsulta</label>
+        </div>
+      </section>
+    </form>
+
+    <aside class="column preview-column">
+      <div class="preview-top">
+        <strong>Texto generado</strong>
+        <span class="status" id="status">Listo para copiar</span>
+      </div>
+      <pre id="historia"></pre>
+    </aside>
+  </main>
+
+  <div class="suggestion-strip">
+    <a class="suggestion-link" href="contacto.html#contacto">¿Tenés alguna sugerencia?</a>
+  </div>
+
+  <div class="suggestion-strip">
+    <a class="suggestion-link coffee-link" href="https://buymeacoffee.com/santiago.saralegui" target="_blank" rel="noopener noreferrer">☕ Invitame un café</a>
+  </div>
+
+  <footer>
+    Desarrollado por Dr. Santiago Saralegui · <a href="contacto.html">Contacto profesional</a>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    const { value, sentence, endDot, lines, bullets } = HF;
+
+    function antecedentesPersonalesTexto() {
+      const extra = [];
+      if (value("habitos")) extra.push(`Hábitos: ${value("habitos")}`);
+      if (value("noEmbarazo")) extra.push("No embarazo ni lactancia");
+      if (value("noAnticoagulantes")) extra.push("No anticoagulantes ni antiagregantes");
+      if (value("noAutoinmunes")) extra.push("No enfermedades autoinmunes ni neuromusculares");
+      if (value("noHerpes")) extra.push("No herpes labial recurrente");
+      if (value("noQueloides")) extra.push("No tendencia a queloides");
+      return HF.antecedentesTexto([...extra, ...HF.alergiaItems()]);
+    }
+
+    function examenTexto() {
+      return [
+        // El examen clásico de adulto solo se transcribe si su casilla está marcada.
+        value("examenClasico") ? HF.examenAdulto("cl") : "",
+        value("fototipo") ? `Fototipo ${value("fototipo")} de Fitzpatrick.` : "",
+        sentence("Piel", value("piel")),
+        sentence("Tercio superior", value("tercioSuperior")),
+        sentence("Tercio medio", value("tercioMedio")),
+        sentence("Tercio inferior", value("tercioInferior")),
+        sentence("Corporal", value("corporal")),
+        value("otrosEf") ? endDot(value("otrosEf")) : ""
+      ].filter(Boolean).join("\n");
+    }
+
+    // Campos que pide cada tipo de procedimiento. detalle: etiqueta del campo que nombra el
+    // procedimiento (solo láser y "otro"); cantidad: etiqueta del campo de cantidad;
+    // unidad: true si se elige entre cc y jeringas; sufijo: unidad fija (p. ej. UI);
+    // utilizado: true si la cantidad libre también se escribe como "se utilizaron ...".
+    const PROCEDIMIENTOS = {
+      "Toxina botulínica": { marca: "Marca", zona: "Zonas tratadas", cantidad: "UI usadas", sufijo: "UI" },
+      "Ácido hialurónico": { marca: "Marca", zona: "Zonas tratadas", cantidad: "Cantidad", unidad: true },
+      "Bioestimulación": { marca: "Marca", zona: "Zona tratada", cantidad: "Cantidad", unidad: true },
+      "Mesoterapia": { marca: "Marca", zona: "Zona tratada", cantidad: "Cantidad", unidad: true },
+      "Corporal": { marca: "Marca", zona: "Zona tratada", cantidad: "Cantidad de producto", utilizado: true },
+      "Láser": { detalle: "Tipo de láser", zona: "Zona tratada" },
+      "Otro": { detalle: "Tipo de procedimiento", marca: "Marca o aparato", zona: "Zona de tratamiento", cantidad: "Cantidad de producto" }
+    };
+
+    // "se utilizaron 30 UI", "se utilizó 1 cc", "se utilizó una jeringa".
+    function utilizadoTexto(cantidad, unidad) {
+      const uno = /^(1|un|una|uno)\b(?![.,]\d)/i.test(cantidad);
+      if (uno && unidad === "jeringas") return "se utilizó una jeringa";
+      return `${uno ? "se utilizó" : "se utilizaron"} ${cantidad}${unidad ? ` ${unidad}` : ""}`;
+    }
+
+    // Ej: "Se realiza tratamiento con toxina botulínica (Botox). Zona tratada: glabela y frontal. Se utilizaron 30 UI"
+    //     "Se realiza tratamiento con láser (CO2). Zona tratada: rostro"
+    function productoTexto() {
+      const tipo = value("procTipo");
+      const campos = PROCEDIMIENTOS[tipo];
+      if (!campos) return "";
+      let nombre = `con ${tipo.toLowerCase()}`;
+      if (tipo === "Corporal") nombre = "corporal";
+      if (tipo === "Láser") nombre = `con láser${value("procDetalle") ? ` (${value("procDetalle")})` : ""}`;
+      if (tipo === "Otro") nombre = value("procDetalle") ? `con ${value("procDetalle")}` : "";
+      if (campos.marca && value("procMarca")) nombre += ` (${value("procMarca")})`;
+
+      const frases = [`Se realiza tratamiento ${nombre}`.trim()];
+      if (value("procZona")) frases.push(`Zona tratada: ${value("procZona")}`);
+      if (campos.cantidad && value("procCantidad")) {
+        const cantidad = value("procCantidad");
+        let frase = "";
+        if (campos.unidad) frase = utilizadoTexto(cantidad, value("procUnidad"));
+        // Si ya se escribió la unidad en el campo (p. ej. "30 UI"), no se repite.
+        else if (campos.sufijo) frase = utilizadoTexto(cantidad, /[a-z]/i.test(cantidad) ? "" : campos.sufijo);
+        else if (campos.utilizado) frase = utilizadoTexto(cantidad, "");
+        if (frase) frases.push(`${frase[0].toUpperCase()}${frase.slice(1)}`);
+        // En "Otro" la cantidad es libre: va tal cual, separada por una coma.
+        else frases[frases.length - 1] += `, ${cantidad}`;
+      }
+      return frases.join(". ");
+    }
+
+    // El procedimiento elegido va primero; después los detalles y las casillas.
+    function procedimientoTexto() {
+      const items = [];
+      if (productoTexto()) items.push(productoTexto());
+      items.push(...lines(value("procedimiento")));
+      if (value("consentimiento")) items.push("Se explican riesgos, beneficios y alternativas. Firma consentimiento informado");
+      if (value("bienTolerado")) items.push("Procedimiento bien tolerado, sin complicaciones inmediatas");
+      return bullets("Procedimiento", items);
+    }
+
+    // Muestra el examen clásico si está marcado y los campos del procedimiento elegido.
+    function mostrarCamposElegidos() {
+      document.getElementById("panelClasico").hidden = !value("examenClasico");
+
+      const campos = PROCEDIMIENTOS[value("procTipo")];
+      document.getElementById("procCampos").hidden = !campos;
+      if (!campos) return;
+      document.getElementById("procDetalleLabel").hidden = !campos.detalle;
+      document.querySelector("#procDetalleLabel span").textContent = campos.detalle || "";
+      document.getElementById("procMarcaLabel").hidden = !campos.marca;
+      document.querySelector("#procMarcaLabel span").textContent = campos.marca || "";
+      document.getElementById("procZonaTexto").textContent = campos.zona;
+      document.getElementById("procCantidadFila").hidden = !campos.cantidad;
+      document.getElementById("procCantidadTexto").textContent = campos.cantidad || "";
+      document.getElementById("procUnidadLabel").hidden = !campos.unidad;
+    }
+
+    function indicacionesTexto() {
+      const items = lines(value("indicaciones"));
+      if (value("signosAlarma")) items.push("Se explican signos de alarma y reconsulta");
+      if (value("control")) items.push(`Control en ${value("control")}`);
+      return bullets("Indicaciones", items);
+    }
+
+    function buildHistoria() {
+      const fichaParts = [];
+      if (value("sexoF")) fichaParts.push("SF");
+      if (value("sexoM")) fichaParts.push("SM");
+      if (value("edad")) fichaParts.push(HF.edadTexto(value("edad")));
+      if (value("trabajo")) fichaParts.push(value("trabajo"));
+
+      const examen = examenTexto();
+
+      return [
+        fichaParts.length ? `FP: ${fichaParts.join(", ")}.` : "",
+        antecedentesPersonalesTexto(),
+        sentence("Antecedentes estéticos", HF.fieldOrNormal("previos", "previosNormal", "Sin antecedentes")),
+        sentence("MC", value("motivoConsulta")),
+        // La motivación solo aparece si se completó.
+        sentence("Motivación", value("motivacion")),
+        examen ? `Examen físico:\n${examen}` : "",
+        value("planteoDiagnostico") ? `Planteo diagnóstico: ${value("planteoDiagnostico")}` : "",
+        procedimientoTexto(),
+        indicacionesTexto()
+      ].filter(Boolean).join("\n\n");
+    }
+
+    // Todavía sin plantillas: el botón "Plantillas" muestra "Próximamente".
+    // Al agregar una acá, aparece sola en el menú.
+    const TEMPLATES = {};
+
+    // Signos vitales del examen clásico (campos con prefijo "cl").
+    const vitalChecks = {};
+    Object.entries(HF.VITALES_ADULTO).forEach(([name, check]) => {
+      vitalChecks[`cl${name[0].toUpperCase()}${name.slice(1)}`] = check;
+    });
+
+    HF.init({
+      draftKey: "historiafacil:borrador:estetica",
+      fileName: "historia-clinica-medicina-estetica.txt",
+      buildHistoria,
+      onUpdate: mostrarCamposElegidos,
+      templates: TEMPLATES,
+      vitalChecks,
+      antecedentePlaceholders: { name: "Ej: hipotiroidismo, HTA", treatment: "Ej: levotiroxina, losartán", other: "Ej: bien controlado" }
+    });
+  </script>
+</body>
+</html>

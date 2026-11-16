@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historia clínica de emergencia pediátrica | Dr. Santiago Saralegui</title>
+  <meta name="description" content="Herramienta web para crear historias clínicas de emergencia pediátrica de forma rápida, ordenada y lista para copiar. Desarrollada por Dr. Santiago Saralegui.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Dr. Santiago Saralegui">
+  <meta property="og:title" content="Historia clínica de emergencia pediátrica">
+  <meta property="og:description" content="Generador rápido de historias clínicas de emergencia pediátrica para profesionales de la salud.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon-64.png" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    const GA_MEASUREMENT_ID = "G-SN3JTPR3M0";
+    if (GA_MEASUREMENT_ID) {
+      const gaScript = document.createElement("script");
+      gaScript.async = true;
+      gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+      document.head.appendChild(gaScript);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", GA_MEASUREMENT_ID);
+    }
+  </script>
+</head>
+<body class="page-index" data-page="pediatria.html">
+  <header>
+    <div class="page-menu" id="pageMenu">
+      <h1><button class="page-toggle" id="pageToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="pageList">Emergencia pediátrica <span class="page-caret" aria-hidden="true">▾</span></button></h1>
+      <div class="template-list page-list" id="pageList" role="menu" hidden></div>
+    </div>
+    <nav class="top-menu" aria-label="Opciones">
+      <a class="menu-item" href="contacto.html">Contacto profesional</a>
+    </nav>
+    <div class="header-actions">
+      <div class="template-menu" id="templateMenu">
+        <button class="button secondary" id="templateToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="templateList">Plantillas ▾</button>
+        <div class="template-list" id="templateList" role="menu" hidden></div>
+      </div>
+      <button class="button" id="copyTop" type="button">Copiar historia</button>
+      <button class="button secondary" id="downloadTxt" type="button">Descargar TXT</button>
+      <button class="button warn" id="clearAll" type="button">Limpiar</button>
+    </div>
+  </header>
+
+  <main>
+    <form class="column form-column" id="hcForm" autocomplete="off">
+      <section>
+        <h2>Ficha patronímica</h2>
+        <div class="check-row">
+          <label class="check"><input type="radio" name="sexo" data-field="sexoF" value="F"> Sexo femenino</label>
+          <label class="check"><input type="radio" name="sexo" data-field="sexoM" value="M"> Sexo masculino</label>
+        </div>
+        <div class="grid three">
+          <label>Edad
+            <input data-field="edad" placeholder="Ej: 3 años, 8 meses">
+          </label>
+          <label>Peso
+            <input data-field="peso" placeholder="Ej: 14 kg">
+          </label>
+          <label>Procedencia
+            <input data-field="procedencia" placeholder="Ej: domicilio, policlínica">
+          </label>
+        </div>
+        <div class="grid">
+          <label>Acompañante
+            <input data-field="acompanante" placeholder="Ej: madre, padre">
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Antecedentes personales</h2>
+        <div id="antecedentes"></div>
+        <button class="button secondary" id="addAntecedente" type="button">Agregar antecedente</button>
+        <p class="hint">Tab pasa al tratamiento. Enter agrega otra línea.</p>
+        <div class="grid">
+          <div class="field-with-check">
+            <label>Perinatales
+              <input data-field="perinatal" placeholder="Ej: RNT, AEG, parto vaginal">
+            </label>
+            <label class="check"><input type="checkbox" data-field="perinatalNormal"> Normal</label>
+          </div>
+        </div>
+        <div class="check-row">
+          <label class="check"><input type="checkbox" data-field="cevVigente"> CEV vigente</label>
+          <label class="check"><input type="checkbox" data-field="buenCrecimiento"> Buen crecimiento y desarrollo</label>
+        </div>
+      </section>
+
+      <section id="seccionAlergias">
+        <h2>Alergias</h2>
+        <label class="check"><input type="checkbox" data-field="sinAlergias" checked> Sin alergias</label>
+        <label id="alergiasLabel">Alergias
+          <input data-field="alergias" placeholder="Ej: dipirona, penicilina">
+        </label>
+      </section>
+
+      <section>
+        <h2>Enfermedad actual</h2>
+        <div class="segmented" id="tipoEa" role="radiogroup" aria-label="Tipo de enfermedad actual" style="--count: 2">
+          <label><input type="radio" name="tipoEa" data-field="eaClasica" checked> Clásica</label>
+          <label><input type="radio" name="tipoEa" data-field="eaSample"> SAMPLE</label>
+          <span class="segmented-thumb" aria-hidden="true"></span>
+        </div>
+        <div class="exam-panel" id="panelEaClasica">
+          <label>Relato
+            <textarea data-field="enfermedad" placeholder="Consulta, síntomas, evolución, medicación recibida, etc."></textarea>
+          </label>
+          <div id="eaChecksClasica">
+            <div class="check-row" id="eaChecks">
+              <label class="check"><input type="checkbox" data-field="noFiebre"> No fiebre</label>
+              <label class="check"><input type="checkbox" data-field="transitoNormal" checked> Tránsitos sin alteraciones</label>
+              <label class="check"><input type="checkbox" data-field="toleraVO" checked> Buena tolerancia a la vía oral</label>
+              <label class="check"><input type="checkbox" data-field="respNegativo"> No dificultad respiratoria, no ruidos audibles a distancia, sin tirajes</label>
+            </div>
+          </div>
+        </div>
+        <div class="exam-panel" id="panelEaSample" hidden>
+          <label>S · Signos y síntomas
+            <input data-field="sampleS" placeholder="Ej: fiebre y tos de 2 días de evolución">
+          </label>
+          <div id="eaChecksSample"></div>
+          <label>A · Alergias
+            <input data-field="sampleA" placeholder="Sin alergias">
+          </label>
+          <label>M · Medicación
+            <input data-field="sampleM" placeholder="No toma medicación">
+          </label>
+          <label>P · Patologías previas
+            <input data-field="sampleP" placeholder="Sin patologías previas">
+          </label>
+          <label>L · Última ingesta
+            <input data-field="sampleL" placeholder="Ej: hace 3 horas, bien tolerada">
+          </label>
+          <label>E · Eventos
+            <input data-field="sampleE" placeholder="Ej: contacto con familiar con cuadro respiratorio">
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Examen físico</h2>
+        <div class="check-row tep-row">
+          <label class="check"><input type="checkbox" data-field="tepEstable" checked> TEP estable</label>
+        </div>
+        <label id="tepDetalleLabel" hidden>TEP inestable
+          <input data-field="tepDetalle" placeholder="Ej: apariencia alterada, aumento del trabajo respiratorio">
+        </label>
+        <div class="segmented" id="tipoExamen" role="radiogroup" aria-label="Tipo de examen físico" style="--count: 2">
+          <label><input type="radio" name="tipoExamen" data-field="examenClasico" checked> Clásico</label>
+          <label><input type="radio" name="tipoExamen" data-field="examenAbcde"> ABCDE</label>
+          <span class="segmented-thumb" aria-hidden="true"></span>
+        </div>
+        <div class="grid three">
+          <label>FC
+            <input data-field="fc" placeholder="Ej: 110">
+          </label>
+          <label>FR
+            <input data-field="fr" placeholder="Ej: 28">
+          </label>
+          <label>SatO2
+            <input data-field="sat" placeholder="Ej: 98% VEA">
+          </label>
+          <label>Temperatura
+            <input data-field="temp" placeholder="Ej: 36,8 °C">
+          </label>
+          <label>PA
+            <input data-field="pa" placeholder="Ej: 100/60">
+          </label>
+          <label>HGT
+            <input data-field="hgt" placeholder="Ej: 95 mg/dL">
+          </label>
+        </div>
+        <div class="exam-panel" id="panelAbcde" hidden>
+          <label>A · Vía aérea
+            <input data-field="abcdeA" value="Vía aérea permeable">
+          </label>
+          <label>B · Respiración
+            <input data-field="abcdeB" value="sin tirajes, MAV + bilateral, sin estertores">
+          </label>
+          <label>C · Circulación
+            <input data-field="abcdeC" value="RR, RBG, sin soplos, relleno capilar menor a 2 segundos, pulsos periféricos presentes">
+          </label>
+          <label>D · Neurológico
+            <input data-field="abcdeD" value="Vigil, reactivo, pupilas simétricas y reactivas">
+          </label>
+          <label>E · Exposición
+            <input data-field="abcdeE" value="Piel sin lesiones">
+          </label>
+          <label>Otros EF
+            <input data-field="abcdeOtros" placeholder="Otro hallazgo del examen físico">
+          </label>
+        </div>
+        <div class="exam-panel" id="panelClasico">
+          <label>General
+            <input data-field="general" value="Buen aspecto general, reactivo">
+          </label>
+          <label>Piel y mucosas
+            <input data-field="pym" value="BHyP">
+          </label>
+          <div class="grid">
+            <div class="field-with-check">
+              <label>BF
+                <input data-field="bf" placeholder="Ej: faringe congestiva, exudados">
+              </label>
+              <label class="check"><input type="checkbox" data-field="bfNormal"> Normal</label>
+            </div>
+          </div>
+          <label>CV
+            <input data-field="cv" value="RR, RBG, sin soplos">
+          </label>
+          <label>PP
+            <input data-field="pp" value="sin tirajes, MAV + bilateral, sin estertores">
+          </label>
+          <div class="grid">
+            <div class="field-with-check">
+              <label>ABD
+                <input data-field="abd" placeholder="Ej: blando, depresible, indoloro, RHA +">
+              </label>
+              <label class="check"><input type="checkbox" data-field="abdNormal"> Normal</label>
+            </div>
+            <div class="field-with-check">
+              <label>LG
+                <input data-field="lg" placeholder="Ej: sin adenomegalias">
+              </label>
+              <label class="check"><input type="checkbox" data-field="lgNormal"> Normal</label>
+            </div>
+            <div class="field-with-check">
+              <label>PNM
+                <input data-field="pnm" placeholder="Ej: sin signos meníngeos">
+              </label>
+              <label class="check"><input type="checkbox" data-field="pnmNormal"> Normal</label>
+            </div>
+            <label>OA
+              <input data-field="oa" placeholder="Ej: sin elementos fluxivos articulares">
+            </label>
+            <div class="field-with-check">
+              <label>Otoscopía
+                <input data-field="otoscopia" placeholder="Ej: membranas timpánicas sin alteraciones">
+              </label>
+              <label class="check"><input type="checkbox" data-field="otoscopiaNormal"> Normal</label>
+            </div>
+            <label>Otros EF
+              <input data-field="otrosEf" placeholder="Otro hallazgo del examen físico">
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Paraclínica, interconsultas o procedimientos</h2>
+        <label>Estudios, resultados e interconsultas
+          <textarea data-field="paraclinica" placeholder="Ej: RxTx, laboratorio, consulta con especialista, procedimientos, etc."></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>Planteo diagnóstico</h2>
+        <label>Planteo diagnóstico
+          <input data-field="planteoDiagnostico" placeholder="Ej: rinofaringitis viral, otitis media aguda">
+        </label>
+      </section>
+
+      <section>
+        <h2>Conducta</h2>
+        <label>Conducta
+          <textarea data-field="conducta" placeholder="Paraclínica, tratamiento, interconsultas, observación, alta, ingreso, etc."></textarea>
+        </label>
+        <div class="check-row">
+          <label class="check"><input type="checkbox" data-field="controlPediatra"> Control post-alta en policlínica de pediatría en 48 horas</label>
+          <label class="check"><input type="checkbox" data-field="reconsultaAlta"> Se explican signos de reconsulta/alta</label>
+        </div>
+      </section>
+    </form>
+
+    <aside class="column preview-column">
+      <div class="preview-top">
+        <strong>Texto generado</strong>
+        <span class="status" id="status">Listo para copiar</span>
+      </div>
+      <pre id="historia"></pre>
+    </aside>
+  </main>
+
+  <div class="suggestion-strip">
+    <a class="suggestion-link" href="contacto.html#contacto">¿Tenés alguna sugerencia?</a>
+  </div>
+
+  <div class="suggestion-strip">
+    <a class="suggestion-link coffee-link" href="https://buymeacoffee.com/santiago.saralegui" target="_blank" rel="noopener noreferrer">☕ Invitame un café</a>
+  </div>
+
+  <footer>
+    Desarrollado por Dr. Santiago Saralegui · <a href="contacto.html">Contacto profesional</a>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    const { value, sentence, line, endDot, lines, bullets, fieldOrNormal } = HF;
+
+    // Relato seguido de las casillas marcadas. Las casillas son las mismas para la
+    // enfermedad actual clásica y para la S del SAMPLE.
+    function relatoConCasillas(relato) {
+      const items = [];
+      if (relato) items.push(relato);
+      if (value("noFiebre")) items.push("No fiebre");
+      if (value("respNegativo")) items.push("No dificultad respiratoria, no ruidos audibles a distancia, sin tirajes");
+      if (value("toleraVO")) items.push("Buena tolerancia a la vía oral");
+      if (value("transitoNormal")) items.push("Tránsitos digestivo y urinario sin alteraciones");
+      return items.map(endDot).join(" ");
+    }
+
+    function antecedentesPediatricos() {
+      const extra = [];
+      const perinatal = fieldOrNormal("perinatal", "perinatalNormal", "Sin antecedentes perinatales a destacar");
+      if (perinatal) extra.push(value("perinatal") ? `Perinatales: ${perinatal}` : perinatal);
+      if (value("cevVigente")) extra.push("CEV vigente");
+      if (value("buenCrecimiento")) extra.push("Buen crecimiento y desarrollo");
+      // Con SAMPLE las alergias van en la letra A, así que no se repiten acá.
+      return HF.antecedentesTexto([...extra, ...(value("eaSample") ? [] : HF.alergiaItems())]);
+    }
+
+    function tepTexto() {
+      if (value("tepEstable")) return "TEP estable.";
+      return endDot(`TEP inestable${value("tepDetalle") ? `: ${value("tepDetalle")}` : ""}`);
+    }
+
+    // La FR normal depende de la edad, así que se escribe el valor sin calificarlo.
+    function frTexto() {
+      return value("fr") ? `FR ${value("fr")} rpm` : "eupneico";
+    }
+
+    function examenClasicoTexto() {
+      const generalParts = [value("general")];
+      if (value("hgt")) generalParts.push(`HGT ${value("hgt")}`);
+      const general = generalParts.filter(Boolean).join(", ");
+
+      const pymParts = [value("pym")];
+      if (value("temp")) pymParts.push(`Tax ${value("temp")}`);
+
+      const cvParts = [];
+      if (value("fc")) cvParts.push(`FC ${value("fc")} cpm`);
+      if (value("pa")) cvParts.push(`PA ${value("pa")} mmHg`);
+      if (value("cv")) cvParts.push(value("cv"));
+
+      const ppParts = [frTexto()];
+      if (value("sat")) ppParts.push(`SatO2 ${value("sat")}`);
+      if (value("pp")) ppParts.push(value("pp"));
+
+      return [
+        general ? `${general}.` : "",
+        line("PyM", pymParts),
+        sentence("BF", fieldOrNormal("bf", "bfNormal", "Faringe sin alteraciones")),
+        sentence("LG", fieldOrNormal("lg", "lgNormal", "Sin adenomegalias")),
+        line("CV", cvParts),
+        line("PP", ppParts),
+        sentence("ABD", fieldOrNormal("abd", "abdNormal", "Blando, depresible, indoloro, sin visceromegalias, RHA +")),
+        sentence("OA", value("oa")),
+        sentence("PNM", fieldOrNormal("pnm", "pnmNormal", "Vigil, reactivo, sin signos meníngeos, sin síndrome focal neurológico")),
+        sentence("Otoscopía", fieldOrNormal("otoscopia", "otoscopiaNormal", "Membranas timpánicas sin alteraciones bilateralmente")),
+        value("otrosEf") ? endDot(value("otrosEf")) : ""
+      ].filter(Boolean);
+    }
+
+    // En el ABCDE cada signo vital va en la letra que le corresponde.
+    function examenAbcdeTexto() {
+      const bParts = [frTexto()];
+      if (value("sat")) bParts.push(`SatO2 ${value("sat")}`);
+      if (value("abcdeB")) bParts.push(value("abcdeB"));
+
+      const cParts = [];
+      if (value("fc")) cParts.push(`FC ${value("fc")} cpm`);
+      if (value("pa")) cParts.push(`PA ${value("pa")} mmHg`);
+      if (value("abcdeC")) cParts.push(value("abcdeC"));
+
+      const dParts = [value("abcdeD")];
+      if (value("hgt")) dParts.push(`HGT ${value("hgt")}`);
+
+      const eParts = [value("abcdeE")];
+      if (value("temp")) eParts.push(`Tax ${value("temp")}`);
+
+      return [
+        sentence("A", value("abcdeA")),
+        line("B", bParts),
+        line("C", cParts),
+        line("D", dParts),
+        line("E", eParts),
+        value("abcdeOtros") ? endDot(value("abcdeOtros")) : ""
+      ].filter(Boolean);
+    }
+
+    // En el SAMPLE salen siempre las seis letras. La S lleva su texto y las casillas marcadas.
+    // Si A, M o P quedan vacías se transcribe el texto gris que muestra el campo; las demás
+    // vacías llevan una barra.
+    const SAMPLE_POR_DEFECTO = { A: "Sin alergias", M: "No toma medicación", P: "Sin patologías previas" };
+
+    function sampleTexto() {
+      return ["S", "A", "M", "P", "L", "E"].map((letra) => {
+        const escrito = value(`sample${letra}`);
+        const texto = letra === "S" ? relatoConCasillas(escrito) : escrito || SAMPLE_POR_DEFECTO[letra];
+        return `${letra}: ${texto ? endDot(texto) : "-"}`;
+      });
+    }
+
+    // Se transcribe solo la variante elegida en cada selector; la otra queda guardada pero no sale.
+    function examenTexto() {
+      const items = value("examenClasico") ? examenClasicoTexto() : examenAbcdeTexto();
+      return `Examen físico:\n${[tepTexto(), ...items].join("\n")}`;
+    }
+
+    function enfermedadTexto() {
+      if (value("eaSample")) return `SAMPLE:\n${sampleTexto().join("\n")}`;
+      return sentence("EA", relatoConCasillas(value("enfermedad")));
+    }
+
+    // Muestra el panel elegido en cada selector y mueve su bolita.
+    function mostrarPanelesElegidos() {
+      const sample = value("eaSample");
+      document.getElementById("panelEaClasica").hidden = sample;
+      document.getElementById("panelEaSample").hidden = !sample;
+      document.getElementById("tipoEa").style.setProperty("--selected", sample ? 1 : 0);
+      // El SAMPLE ya incluye las alergias: se oculta esa sección sin borrar lo escrito.
+      document.getElementById("seccionAlergias").hidden = sample;
+      // Las casillas se muestran debajo del relato o debajo de la S, según la variante elegida.
+      document.getElementById(sample ? "eaChecksSample" : "eaChecksClasica").appendChild(document.getElementById("eaChecks"));
+
+      const clasico = value("examenClasico");
+      document.getElementById("panelClasico").hidden = !clasico;
+      document.getElementById("panelAbcde").hidden = clasico;
+      document.getElementById("tipoExamen").style.setProperty("--selected", clasico ? 0 : 1);
+
+      document.getElementById("tepDetalleLabel").hidden = value("tepEstable");
+    }
+
+    function conductaTexto() {
+      const items = lines(value("conducta"));
+      if (value("controlPediatra")) items.push("Control post-alta en policlínica de pediatría en 48 horas");
+      if (value("reconsultaAlta")) {
+        items.push("Se explican signos de reconsulta");
+        items.push("Alta");
+      }
+      return bullets("Conducta", items);
+    }
+
+    function buildHistoria() {
+      const femenino = value("sexoF");
+      const fichaParts = [];
+      if (femenino) fichaParts.push("SF");
+      if (value("sexoM")) fichaParts.push("SM");
+      if (value("edad")) fichaParts.push(HF.edadTexto(value("edad")));
+      if (value("peso")) fichaParts.push(/[a-z]/i.test(value("peso")) ? value("peso") : `${value("peso")} kg`);
+      if (value("procedencia")) fichaParts.push(`procedente de ${value("procedencia")}`);
+      if (value("acompanante")) fichaParts.push(`${femenino ? "acompañada" : "acompañado"} por ${value("acompanante")}`);
+
+      return [
+        fichaParts.length ? `FP: ${fichaParts.join(", ")}.` : "",
+        antecedentesPediatricos(),
+        enfermedadTexto(),
+        examenTexto(),
+        lines(value("paraclinica")).map(endDot).join("\n"),
+        value("planteoDiagnostico") ? `Planteo diagnóstico: ${value("planteoDiagnostico")}` : "",
+        conductaTexto()
+      ].filter(Boolean).join("\n\n");
+    }
+
+    // Cada plantilla completa las dos variantes de enfermedad actual y de examen físico,
+    // así sirve con cualquiera que se elija en los selectores. La conducta la escribe el médico.
+    const TEMPLATES = {
+      faringitisViral: {
+        label: "Faringitis viral",
+        enfermedad: "Comienza hace ___ días con rinorrea serosa y tos.",
+        respNegativo: true,
+        sampleS: "Comienza hace ___ días con rinorrea serosa y tos.",
+        bf: "Faringe congestiva, sin exudados",
+        abcdeOtros: "BF: faringe congestiva, sin exudados",
+        planteoDiagnostico: "Faringitis viral"
+      }
+    };
+
+    HF.init({
+      draftKey: "historiafacil:borrador:pediatria",
+      fileName: "historia-clinica-emergencia-pediatrica.txt",
+      buildHistoria,
+      onUpdate: mostrarPanelesElegidos,
+      templates: TEMPLATES,
+      templatesNote: "Más plantillas próximamente",
+      // FC, FR y PA normales dependen de la edad: solo se resaltan los valores que no dependen de ella.
+      vitalChecks: { sat: HF.VITALES_ADULTO.sat, temp: HF.VITALES_ADULTO.temp, hgt: HF.VITALES_ADULTO.hgt },
+      antecedentePlaceholders: { name: "Ej: asma, epilepsia", treatment: "Ej: salbutamol, ácido valproico", other: "Ej: internaciones previas" }
+    });
+  </script>
+</body>
+</html>
